@@ -1,0 +1,30 @@
+{
+  "name": "holandly2",
+  "version": "1.0.0",
+  "description": "event scheduling app",
+  "main": "src/app.ts",
+  "scripts": {
+    "start": "tsc && node dist/app.js"
+  },
+  "author": "holateam4",
+  "license": "ISC",
+  "dependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/compression": "0.0.36",
+    "@types/dotenv": "^6.1.0",
+    "@types/express": "^4.16.0",
+    "@types/express-session": "^1.15.11",
+    "@types/helmet": "0.0.42",
+    "@types/mysql": "^2.15.5",
+    "@types/winston": "^2.4.4",
+    "body-parser": "^1.18.3",
+    "compression": "^1.7.3",
+    "dotenv": "^6.1.0",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "helmet": "^3.15.0",
+    "mysql": "^2.16.0",
+    "typescript": "^3.1.6",
+    "winston": "^3.1.0"
+  }
+}
