@@ -2,7 +2,7 @@ import winston, { debug } from 'winston';
 import mysql from 'mysql';
 import session from 'express-session';
 
-//const MySqlStore = require('express-mysql-session')(session);
+const MySqlStore = require('express-mysql-session')(session);
 
 export const logger = winston.createLogger({
     level: 'debug',
@@ -22,9 +22,9 @@ export const dbPool = mysql.createPool({
     database: process.env.DB_NAME
 });
 
-// export const sessionConfig = {
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//     store: new MySqlStore({}, dbPool)
-// };
+export const sessionConfig = {
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: new MySqlStore({}, dbPool)
+};

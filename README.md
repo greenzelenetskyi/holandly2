@@ -10,4 +10,4 @@ Export database:
   
 Add .env file to the working directory
 
-Run npm run start
+Run ./startup.sh

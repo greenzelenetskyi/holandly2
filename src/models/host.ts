@@ -28,3 +28,8 @@ export const getConfigData = (db: Pool, field: string, userid: number) => {
   let sqlString = `select ?? from host where userid=?`;
   return makeSqlQuery(db, sqlString, [field, userid]);
 }
+
+export const findUser = (param: object, db: any) => {
+  let sqlString = `select userId, username, password from holandly.host where ?`;
+  return makeSqlQuery(db, sqlString, param);
+}

@@ -1,6 +1,42 @@
 import { Request, Response } from "express";
 import * as hostModel from '../models/host';
 import { logger } from '../config/host';
+import pug from 'pug';
+
+export const requireLogin = (req: Request, res: Response, next: Function) => {
+    if (req.path == '/login') {
+        next();
+    } else if (!req.isAuthenticated()) {
+        res.redirect('/edit/login');
+    } else {
+        next();
+    }
+}
+
+export const getMainPage = (req: Request, res: Response) => {
+    try {
+        res.render('users/personal', { login: req.user.username });
+    } catch (err) {
+        logger.error(err)
+    }
+}
+
+export const getLoginPage = (req: Request, res: Response) => {
+    try {
+        res.render('users/signIn');
+    } catch (err) {
+        logger.error(err)
+    }
+}
+
+export const stopSession = (req: Request, res: Response) => {
+    req.session.destroy((err: Error) => {
+        if (err)
+            throw err;
+        res.redirect('/edit/login');
+    });
+}
+
 
 export const setConfiguration = async (req: Request, res: Response) => {
     try {
