@@ -9,15 +9,14 @@ html
     link(href='/css/bootstrap.min.css', rel='stylesheet')
     link(href='/css/fullcalendar.min.css', rel='stylesheet')
     link(href='/css/fullcalendar.print.min.css', rel='stylesheet', media='print')
+    link(href='../js/lib2/css/bootstrap/tabulator_bootstrap4.min.css', rel='stylesheet')
+    link(rel='stylesheet', href='../js/lib2/css/jsoneditor.css')
+    script(type='text/javascript', src='../js/lib2/js/tabulator.min.js')
     style
         include ../../src/public/css/personal.css
     script
         include ../../src/public/js/lib/jquery-3.3.1.js
     body
-        title= title
-        //script.
-        //    console.log(options)
-
         block tab_menu
         p.text-center.text-muted © 2018 Holateam 4
     script(src='../js/lib/moment.min.js')
@@ -28,6 +27,8 @@ html
     script(src='../js/lib/fullcalendar.min.js')
     script(src='../js/lib/ru.js')
     script(src='../js/lib/theme-chooser.js')
+    script(src='../js/lib2/js/jquery.min.js')
+    script(src='../js/lib2/js/jquery.jsoneditor.js')
     script
         include ../../src/public/js/personal.js
         include ../../src/public/js/server-request.js
