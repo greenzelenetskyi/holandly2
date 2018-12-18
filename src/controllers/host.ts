@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as hostModel from '../models/host';
 import { logger } from '../config/host';
-import pug from 'pug';
+
 
 export const requireLogin = (req: Request, res: Response, next: Function) => {
     if (req.path == '/login') {
@@ -44,9 +44,10 @@ export const setConfiguration = async (req: Request, res: Response) => {
         let configuration;
         let publicData = configuration = req.body;
         filterPrivateData(publicData, privateData);
-        let status = await hostModel.updateConfig(req.app.get('dbPool'), configuration, publicData, privateData, 1);
+        let status = await hostModel.updateConfig(req.app.get('dbPool'), 
+                     configuration, publicData, privateData, req.user.userId);
         if (status.affectedRows > 0) {
-
+            res.end();
         } else {
             res.status(400).end();
         }
@@ -73,12 +74,56 @@ const filterPrivateData = (config: any, secureData: any) => {
 
 export const getConfigData = async (req: Request, res: Response) => {
     try {
-        let json = await hostModel.getConfigData(req.app.get('dbPool'), 'configuration', 1);
+        let json = await hostModel.getConfigData(req.app.get('dbPool'), 'configuration', req.user.userId);
         if (json.length > 0) {
             res.json(JSON.parse(json[0].configuration));
         }
         res.status(400).end();
     } catch (err) {
         logger.error(err);
+    }
+}
+
+export const getAppointments = async (req: Request, res: Response) => {
+    try {
+        let appointments = await hostModel.getActiveEvents(req.app.get('dbPool'), req.user.userId);
+        res.json(appointments);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).end();
+    }
+}
+
+export const cancelAppointment = async (req: Request, res: Response) => {
+    try {
+        for(let eventId of req.body) {
+          let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId);
+        }
+    } catch (err) {
+        logger.error(err);
+        res.status(500).end();
+    }
+}
+
+export const addAppointment = async (req: Request, res: Response) => {
+    try {
+        let duplicate = await hostModel.findDuplicate(req.app.get('dbPool'), req.body);
+        if(duplicate.length > 0) {
+            res.status(400).json({error: 'This appointment already exists'})
+        }
+        await hostModel.insertScheduledEvent(req.app.get('dbPool'), req.body);
+        res.end();
+    } catch (err) {
+        logger.error(err);
+        res.status(500).end();
+    }
+}
+
+export const markAttended = async (req: Request, res: Response) => {
+    try {
+        await hostModel.markShowedUp(req.app.get('dbPool'), req.body.eventId);
+    } catch (err) {
+        logger.error(err);
+        res.status(500).end();
     }
 }

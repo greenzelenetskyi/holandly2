@@ -10,4 +10,6 @@ Export database:
   
 Add .env file to the working directory
 
+Install redis
+
 Run ./startup.sh

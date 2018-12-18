@@ -17,3 +17,11 @@ host.get('/logout', hostController.stopSession);
 host.route('/config')
   .get(hostController.getConfigData)
   .post(hostController.setConfiguration);
+
+host.post('/event', hostController.addAppointment);
+
+host.get('/events', hostController.getAppointments);
+
+host.put('/cancel', hostController.cancelAppointment);
+
+host.put('/attended', hostController.markAttended);

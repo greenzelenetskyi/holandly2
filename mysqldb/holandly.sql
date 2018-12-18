@@ -60,6 +60,7 @@ CREATE TABLE `scheduled_events` (
   `userid` int(11) NOT NULL,
   `cancelledbyhost` tinyint(4) DEFAULT '0',
   `cancelledbyvisitor` tinyint(4) DEFAULT '0',
+  `showed_up` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`eventid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -70,7 +71,33 @@ CREATE TABLE `scheduled_events` (
 
 LOCK TABLES `scheduled_events` WRITE;
 /*!40000 ALTER TABLE `scheduled_events` DISABLE KEYS */;
+INSERT INTO `scheduled_events` VALUES (1,'some','07-09-1993','12:00','email@a.com','Вася',1,0,0,NULL);
 /*!40000 ALTER TABLE `scheduled_events` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sessions` (
+  `session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `expires` int(11) unsigned NOT NULL,
+  `data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  PRIMARY KEY (`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sessions`
+--
+
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES ('D6JO7V2nTSFBlZ8c4SroLPwkcILgxBqs',1545073210,'{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"}}'),('MRPdE_XgLcHcvh2qLp_o4vVa4fdw2YZn',1544797558,'{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"passport\":{\"user\":{\"userId\":1,\"username\":\"shpp\"}}}');
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -82,4 +109,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-02 15:52:53
+-- Dump completed on 2018-12-18 19:52:42

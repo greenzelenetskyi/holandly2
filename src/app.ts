@@ -13,7 +13,6 @@ import helmet from 'helmet';
 import passportLocal from 'passport-local';
 import path from 'path';
 import passport = require('passport');
-import pug from 'pug';
 const numCPUs = os.cpus().length;
 
 const LocalStrategy = passportLocal.Strategy;
