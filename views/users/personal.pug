@@ -4,8 +4,7 @@ block block_visitors
         .card.border-primary.mb-4.shadow-lg
             .card-header
                 span#select-stats(style='margin:20px 20px 0 20px; font-size: 1em;')
-                    a
-                        | Выбрано:
+                    a Выбрано:
                         span.highlight 0
                 #deselect-all.a.btn.btn-outline-info Отменить выбор
                 .rouded.float-right
@@ -33,7 +32,7 @@ block block_visitors
             ],
             rowSelectionChanged: function (data, rows) {
                 //update selected row counter on selection change
-                $("#select-stats span").text(' '+data.length);
+                $("#select-stats span").text(' ' + data.length);
                 console.log(table.getSelectedRows());
             }
         });
@@ -53,14 +52,12 @@ block block_patterns
             .card-header
                 //strong Конфигурация
                 .rouded.float-right
-                    a.btn.btn-outline-info Развернуть
-                    a.btn.btn-outline-info Свернуть
+                    #expander.a.btn.btn-outline-info Развернуть
                     a.btn.btn-outline-success Сохранить
             .card-body.text-primary
                 p.em.small.font-italic#path
                 #editor.json-editor
-        hr
-        .input-group
+        .input-group(hidden)
             .input-group-prepend
                 span.input-group-text JSON
             textarea#json.form-control(aria-label='JSON')
@@ -90,6 +87,11 @@ block block_patterns
                 }
                 $('#editor').jsonEditor(testjson, {change: updateJSON, propertyclick: showPath});
                 printJSON();
+            });
+            $('#expander').click(function () {
+                var editor = $('#editor');
+                editor.toggleClass('expanded');
+                $(this).text(editor.hasClass('expanded') ? 'Свернуть' : 'Развернуть');
             });
             printJSON();
             $('#editor').jsonEditor(testjson, {change: updateJSON, propertyclick: showPath});
