@@ -1,23 +1,25 @@
 extends menu
 block block_visitors
     .tab-content.shadow-lg.p-3.mb-5.bg-white.rounded
-        #visitorsTable
-        hr
-        #deselect-all.a.btn.btn-outline-info Отменить выбор
-        span#select-stats(style='margin:20px 20px 0 20px; font-size: 1em;')
-            strong
-                | Выбрано:
-                span.highlight 0
-        #select-all.a.btn.btn-outline-danger Отменить участие
-        #select-reschedule.a.btn.btn-outline-primary Перерегистрация
-        #select-setdone.a.btn.btn-outline-success Установить как выполнено
-
+        .card.border-primary.mb-4.shadow-lg
+            .card-header
+                span#select-stats(style='margin:20px 20px 0 20px; font-size: 1em;')
+                    a
+                        | Выбрано:
+                        span.highlight 0
+                #deselect-all.a.btn.btn-outline-info Отменить выбор
+                .rouded.float-right
+                    #select-all.a.btn.btn-outline-danger Отменить участие
+                    #select-reschedule.a.btn.btn-outline-primary Перерегистрация
+                    #select-setdone.a.btn.btn-outline-success Установить как выполнено
+            .card-body.text-primary
+                #visitorsTable
     script.
         var table = new Tabulator("#visitorsTable", {
-            height: window.innerHeight - 256,
+            height: window.innerHeight - 400,
             layout: "fitColumns",
             movableRows: true,
-            groupBy: "event",
+            // groupBy: "event",
             selectable: true,
             headerFilterPlaceholder: "Фильтр...",
             columns: [ //Define Table Columns
@@ -31,20 +33,14 @@ block block_visitors
             ],
             rowSelectionChanged: function (data, rows) {
                 //update selected row counter on selection change
-                $("#select-stats span").text(data.length);
+                $("#select-stats span").text(' '+data.length);
                 console.log(table.getSelectedRows());
-            },
-            // rowClick: function (e, row) { //trigger an alert message when the row is clicked
-            //     alert("Row " + row.getData().id + " Clicked!!!!");
-            // }
+            }
         });
-
-
         //select row on "select all" button click
         $("#select-all").click(function () {
             table.selectRow();
         });
-
         //deselect row on "deselect all" button click
         $("#deselect-all").click(function () {
             table.deselectRow();
@@ -53,13 +49,22 @@ block block_visitors
 
 block block_patterns
     .tab-content.shadow-lg.p-3.mb-5.bg-white.rounded
-        #path
-        row
-            #editor.json-editor
-            textarea#json
-
+        .card.border-primary.mb-4.shadow-lg
+            .card-header
+                //strong Конфигурация
+                .rouded.float-right
+                    a.btn.btn-outline-info Развернуть
+                    a.btn.btn-outline-info Свернуть
+                    a.btn.btn-outline-success Сохранить
+            .card-body.text-primary
+                p.em.small.font-italic#path
+                #editor.json-editor
+        hr
+        .input-group
+            .input-group-prepend
+                span.input-group-text JSON
+            textarea#json.form-control(aria-label='JSON')
     script.
-
         function printJSON() {
             $('#json').val(JSON.stringify(json));
         }
@@ -83,7 +88,8 @@ block block_patterns
                 } else {
                     json = {};
                 }
-               // $('#editor').jsonEditor(testjson, {change: updateJSON, propertyclick: showPath});
+                $('#editor').jsonEditor(testjson, {change: updateJSON, propertyclick: showPath});
+                printJSON();
             });
             printJSON();
             $('#editor').jsonEditor(testjson, {change: updateJSON, propertyclick: showPath});

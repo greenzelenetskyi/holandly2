@@ -26,34 +26,6 @@ block tab_menu
         #nav-patterns.tab-pane.fade(role='tabpanel', aria-labelledby='nav-patterns-tab')
             block block_patterns
 
-    // Modal reschedule event
-    #event-modal-form.modal.fade(tabindex='-1', role='dialog', aria-labelledby='newEventModalLabel', aria-hidden='true')
-        form
-            .modal-dialog.modal-sm(role='document')
-                .modal-content
-                    .modal-header
-                        h5#newEventModalLabel.modal-title Перпланировать событие
-                        button.close(type='button', data-dismiss='modal', aria-label='Close')
-                            span(aria-hidden='true') ×
-                    .modal-body
-                        input#modalPatternId(type='text', hidden)
-                        input#modalEventId(type='text', hidden)
-                        input#oldDate(type='date', hidden)
-                        input#oldTime(type='time', hidden)
-                        input#eventDuration(type='number', hidden)
-                        .form-group
-                            label(for='inputDate') Дата
-                            input#inputDate.form-control(type='date')
-                        .form-group
-                            label(for='inputTime') Время
-                            input#inputTime.form-control(type='time')
-                        .form-group
-                            label(for='reScheduledDescription') Причина
-                            textarea#reScheduledDescription.form-control(aria-label='With textarea')
-                    .modal-footer
-                        button.btn.btn-secondary(type='button', data-dismiss='modal') Отмена
-                        input.btn.btn-primary(type='submit', value='Сохранить')
-
     // Modal remove
     #remove-modal-form.modal.fade(tabindex='-1', role='dialog', aria-labelledby='removeModalLabel', aria-hidden='true')
         form
@@ -75,35 +47,6 @@ block tab_menu
                     .modal-footer
                         button.btn.btn-secondary(type='button', data-dismiss='modal') Отмена
                         input.btn.btn-primary(type='submit', value='Удалить')
-
-    // Modal webhook
-    #webhook-modal-form.modal.fade(tabindex='-1', role='dialog', aria-labelledby='webhookModalLabel', aria-hidden='true')
-        form
-            .modal-dialog(role='document')
-                .modal-content
-                    .modal-header
-                        h5.modal-title Настройка оповещений
-                        button.close(type='button', data-dismiss='modal', aria-label='Close')
-                            span(aria-hidden='true') ×
-                    .modal-body
-                        .form-group
-                            label(for='aboutData') Информация об организаторе
-                            textarea#aboutData.form-control(aria-label='With textarea', aria-describedby='aboutDataHelp')
-                            small#aboutDataHelp.font-italic.form-text.text-muted Информация об организаторе будет включена в сообщение оповещения
-                        .form-group
-                            label(for='apiKey') apiKey
-                            .input-group.mb-3
-                                input#apiKey.form-control(aria-label='text', aria-describedby='apiKeyHelp', readonly='', value='-')
-                                .input-group-append
-                                    button#apiKayGenerate.btn.btn-outline-secondary(type='button') Генерировать
-                            //small#apiKeyHelp.font-italic.form-text.text-muted apiKey help
-                        .form-group
-                            label(for='endpointData') Список серверов
-                            textarea#endpointData.form-control(aria-label='With textarea', aria-describedby='endpointDataHelp')
-                            small#endpointDataHelp.font-italic.form-text.text-muted Строка = URL одного сервера
-                    .modal-footer
-                        button.btn.btn-secondary(type='button', data-dismiss='modal') Отмена
-                        input.btn.btn-primary(type='submit', value='Сохранить')
 
 
     //script.
