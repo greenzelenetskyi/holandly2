@@ -58,10 +58,19 @@ block block_visitors
                 }
             });
         }
-        // host.put('/cancel', hostController.cancelAppointment);
-        //
-        // host.put('/attended', hostController.markAttended);
 
+        function rescheduleVisitors(id) {
+            console.log(id);
+            $.ajax({
+                type: 'put',
+                url: '/edit/reschedule/',
+                data: JSON.stringify(id),
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log('rescheduleVisitors ok');
+                }
+            });
+        }
 
         var table = new Tabulator("#visitorsTable", {
             height: window.innerHeight - 400,
@@ -107,8 +116,16 @@ block block_visitors
         });
 
         $("#select-reschedule").click(function () {
-            console.log("=====> reschedule");
-            console.log(table.getSelectedData());
+            var selected = table.getSelectedData();
+            if (selected.length > 0) {
+                if (selected.length > 1) {
+                    alert('Перерегистрировать можно только отделно по одному участнику!')
+                }
+                else {
+                    console.log("=====> reschedule");
+                    rescheduleVisitors(selected[0].id);
+                }
+            }
         });
 
         $("#select-attended").click(function () {
