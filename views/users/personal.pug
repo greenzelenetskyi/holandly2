@@ -32,20 +32,32 @@ block block_visitors
                 }
             });
         }
-        // function cancelVisitors(id, description) {
-        //     console.log(id);
-        //     console.log(description);
-        //     $.ajax({
-        //         type: "delete",
-        //         url: '/edit/pattern/' + id,
-        //         data: JSON.stringify({'Reason': description}),
-        //         contentType: 'application/json',
-        //         success: function (data) {
-        //             console.log(data);
-        //             getPatterns();
-        //         }
-        //     });
-        // }
+        function cancelVisitors(id, description) {
+            console.log(id);
+            console.log(description);
+            $.ajax({
+                type: "delete",
+                url: '/edit/pattern/' + id,
+                data: JSON.stringify({'Reason': description}),
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function attendedVisitors(ids) {
+            console.log(ids);
+            $.ajax({
+                type: 'put',
+                url: '/edit/attended/',
+                data: JSON.stringify(ids),
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log('attendedVisitors ok');
+                }
+            });
+        }
         // host.put('/cancel', hostController.cancelAppointment);
         //
         // host.put('/attended', hostController.markAttended);
@@ -75,16 +87,41 @@ block block_visitors
             table.deselectRow();
         });
         $("#select-cancel").click(function () {
-            console.log("=====> cancel");
-            console.log(table.getSelectedData());
+            var selected = table.getSelectedData();
+            if (selected.length > 0) {
+                console.log("=====> cancel");
+                var description = 'Отсмена участия:\n';
+                var cancelId = [];
+                selected.forEach(function (visitor) {
+                    console.log(visitor);
+                    cancelId.push(visitor.id);
+                    description += visitor.name + ' ( ' + visitor.email + ' )\n';
+                });
+                $('#descriptionText')[0].innerText = description;
+                remove = function () {
+                    cancelVisitors(ss, $("#reason").val());
+                }
+                //$.noConflict();
+                $("#remove-modal-form").modal();//.modal();
+            }
         });
+
         $("#select-reschedule").click(function () {
             console.log("=====> reschedule");
             console.log(table.getSelectedData());
         });
+
         $("#select-attended").click(function () {
-            console.log("=====> attended");
-            console.log(table.getSelectedData());
+            var selected = table.getSelectedData();
+            if (selected.length > 0) {
+                console.log("=====> attended");
+                var cancelId = [];
+                selected.forEach(function (visitor) {
+                    console.log(visitor);
+                    cancelId.push(visitor.id);
+                });
+                attendedVisitors(cancelId);
+            }
         });
 
 block block_patterns

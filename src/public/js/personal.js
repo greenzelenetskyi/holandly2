@@ -13,7 +13,9 @@ $(document).ready(function () {
         logoVisibility();
     });
     logoVisibility();
-    // addHandlerFormSubmit();
+
+
+    addHandlerFormSubmit();
 
 
     // $(".updateData").click(function () {
@@ -27,33 +29,33 @@ $(document).ready(function () {
     updateAll();
 });
 
-// function addHandlerFormSubmit() {
-//     var patternModalForm = $("#pattern-modal-form");
-//     patternModalForm.submit(function (event) {
-//         event.preventDefault();
-//         putPattern();
-//         patternModalForm.modal('hide');
-//     });
-//
-//     var eventModalForm = $("#event-modal-form");
-//     eventModalForm.submit(function (event) {
-//         event.preventDefault();
-//         newEvent();
-//         eventModalForm.modal('hide');
-//     });
-//
-//     var removeModalForm = $("#remove-modal-form");
-//     removeModalForm.submit(function (event) {
-//         event.preventDefault();
-//         removeModalForm.modal('hide');
-//         if (!!remove) {
-//             remove();
-//         }
-//     });
-// }
+function addHandlerFormSubmit() {
+    // var patternModalForm = $("#pattern-modal-form");
+    // patternModalForm.submit(function (event) {
+    //     event.preventDefault();
+    //     putPattern();
+    //     patternModalForm.modal('hide');
+    // });
+
+    // var eventModalForm = $("#event-modal-form");
+    // eventModalForm.submit(function (event) {
+    //     event.preventDefault();
+    //     newEvent();
+    //     eventModalForm.modal('hide');
+    // });
+
+    var removeModalForm = $("#remove-modal-form");
+    removeModalForm.submit(function (event) {
+        event.preventDefault();
+        removeModalForm.modal('hide');
+        if (!!remove) {
+            remove();
+        }
+    });
+}
 
 
-// var remove;
+ var remove;
 
 function updateAll() {
     // getConfig();
