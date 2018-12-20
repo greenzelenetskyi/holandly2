@@ -188,23 +188,23 @@
 //     });
 // }
 //
-// function logOut() {
-//     console.log('logout');
-//     $.ajax({
-//         type: "get",
-//         url: '/edit/logout',
-//         success: function (data, textStatus, request) {
-//             $.ajax({
-//                 type: "get",
-//                 url: "/edit",
-//                 dataType: "html",
-//                 success: function (data, textStatus, request) {
-//                     window.location = "/edit";
-//                 }
-//             })
-//         }
-//     });
-// }
+function logOut() {
+    console.log('logout');
+    $.ajax({
+        type: "get",
+        url: '/edit/logout',
+        success: function (data, textStatus, request) {
+            $.ajax({
+                type: "get",
+                url: "/edit",
+                dataType: "html",
+                success: function (data, textStatus, request) {
+                    window.location = "/edit";
+                }
+            })
+        }
+    });
+}
 //
 //
 // function apiDataForm(data) {

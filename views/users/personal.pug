@@ -28,7 +28,7 @@ block block_visitors
                 success: function (data) {
                     console.log('======> getVisitors');
                     console.log(data);
-                    //table.setData(data);
+                    table.setData(data);
                 }
             });
         }
@@ -150,12 +150,12 @@ block block_patterns
                     #expander.a.btn.btn-outline-info Развернуть
                     #postConfig.a.btn.btn-outline-success Сохранить
             .card-body.text-primary
+                .input-group
+                    .input-group-prepend
+                        span.input-group-text JSON
+                    textarea#json.form-control(aria-label='JSON')
                 p.em.small.font-italic#path
                 #editor.json-editor
-        .input-group(hidden)
-            .input-group-prepend
-                span.input-group-text JSON
-            textarea#json.form-control(aria-label='JSON')
 
     script.
         function printJSON() {
@@ -168,7 +168,7 @@ block block_patterns
 
         function updateJSON(data) {
             json_config = data;
-            printJSON();
+            $('#json').val(JSON.stringify(json_config));
             console.log('======> updateJSON');
             console.log(data);
         }
@@ -198,8 +198,6 @@ block block_patterns
                 $(this).text(editor.hasClass('expanded') ? 'Свернуть' : 'Развернуть');
             });
 
-            //printJSON();
-
             $("#postConfig").click(function () {
                 postConfig(json_config);
             });
@@ -228,9 +226,8 @@ block block_patterns
                 $.ajax({
                     type: 'post',
                     url: '/edit/config',
-                    dataType: 'json',
-                    //data: JSON.stringify(config),
-                    data: config,
+                    data: JSON.stringify(config),
+                    contentType: 'application/json',
                     response: 'json',
                     success: function (data) {
                         console.log('======> postConfig ok');
