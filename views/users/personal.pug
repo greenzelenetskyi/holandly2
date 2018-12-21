@@ -36,9 +36,12 @@ block block_visitors
             console.log(id);
             console.log(description);
             $.ajax({
-                type: "delete",
-                url: '/edit/pattern/' + id,
-                data: JSON.stringify({'Reason': description}),
+                type: "put",
+                url: '/edit/cancel',
+                data: JSON.stringify({
+                    'reasone': description,
+                    'eventid': id
+                }),
                 contentType: 'application/json',
                 success: function (data) {
                     console.log(data);
@@ -50,8 +53,8 @@ block block_visitors
             console.log(ids);
             $.ajax({
                 type: 'put',
-                url: '/edit/attended/',
-                data: JSON.stringify(ids),
+                url: '/edit/attended',
+                data: JSON.stringify({'eventid': ids}),
                 contentType: 'application/json',
                 success: function (data) {
                     console.log('attendedVisitors ok');
@@ -63,8 +66,8 @@ block block_visitors
             console.log(id);
             $.ajax({
                 type: 'put',
-                url: '/edit/reschedule/',
-                data: JSON.stringify(id),
+                url: '/edit/reschedule',
+                data: JSON.stringify({'events': id}),
                 contentType: 'application/json',
                 success: function (data) {
                     console.log('rescheduleVisitors ok');
@@ -103,14 +106,13 @@ block block_visitors
                 var cancelId = [];
                 selected.forEach(function (visitor) {
                     console.log(visitor);
-                    cancelId.push(visitor.id);
+                    cancelId.push(visitor.eventid);
                     description += visitor.name + ' ( ' + visitor.email + ' )\n';
                 });
                 $('#descriptionText')[0].innerText = description;
                 remove = function () {
-                    cancelVisitors(ss, $("#reason").val());
+                    cancelVisitors(cancelId, $("#reason").val());
                 }
-                //$.noConflict();
                 $("#remove-modal-form").modal();//.modal();
             }
         });
@@ -123,7 +125,9 @@ block block_visitors
                 }
                 else {
                     console.log("=====> reschedule");
-                    rescheduleVisitors(selected[0].id);
+                    var reschedule = [];
+                    reschedule.push(selected[0].eventid);
+                    rescheduleVisitors(reschedule);
                 }
             }
         });
@@ -132,12 +136,12 @@ block block_visitors
             var selected = table.getSelectedData();
             if (selected.length > 0) {
                 console.log("=====> attended");
-                var cancelId = [];
+                var attendedId = [];
                 selected.forEach(function (visitor) {
                     console.log(visitor);
-                    cancelId.push(visitor.id);
+                    attendedId.push(visitor.eventid);
                 });
-                attendedVisitors(cancelId);
+                attendedVisitors(attendedId);
             }
         });
 
@@ -238,6 +242,4 @@ block block_patterns
             $(".updateData").click(function () {
                 getConfig();
             });
-
-
         });
