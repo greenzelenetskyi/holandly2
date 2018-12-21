@@ -38,7 +38,10 @@ block block_visitors
             $.ajax({
                 type: "put",
                 url: '/edit/cancel',
-                data: JSON.stringify({'events': description}),
+                data: JSON.stringify({
+                    'reasone': description,
+                    'eventid': id
+                }),
                 contentType: 'application/json',
                 success: function (data) {
                     console.log(data);
@@ -103,7 +106,7 @@ block block_visitors
                 var cancelId = [];
                 selected.forEach(function (visitor) {
                     console.log(visitor);
-                    cancelId.push({'eventid': visitor.eventid});
+                    cancelId.push(visitor.eventid);
                     description += visitor.name + ' ( ' + visitor.email + ' )\n';
                 });
                 $('#descriptionText')[0].innerText = description;
@@ -122,7 +125,9 @@ block block_visitors
                 }
                 else {
                     console.log("=====> reschedule");
-                    rescheduleVisitors(selected[0].id);
+                    var reschedule = [];
+                    reschedule.push(selected[0].eventid);
+                    rescheduleVisitors(reschedule);
                 }
             }
         });
@@ -237,6 +242,4 @@ block block_patterns
             $(".updateData").click(function () {
                 getConfig();
             });
-
-
         });
