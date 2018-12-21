@@ -12,7 +12,7 @@ const makeSqlQuery = (db: Pool, sqlString: string, params?: any): Promise<any> =
   }
 
 export const getActiveEvents = (db: Pool, userId: number) => {
-  let sqlString = `SELECT eventid, name, email, type AS event, date AS dateEvent, time AS timeEvent, insertion_time
+  let sqlString = `SELECT eventid, name, email, type AS event, date AS dateEvent, time AS timeEvent, showed_up as attended, insertion_time
    FROM holandly.scheduled_events WHERE userid=? && cancelledbyhost <> 1 && cancelledbyvisitor <> 1`;
   return makeSqlQuery(db, sqlString, userId);
 }

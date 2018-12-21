@@ -100,7 +100,7 @@ export const getAppointments = async (req: Request, res: Response) => {
     }
 }
 
-export const cancelAppointment = async (req: Request, res: Response, next: Function) => {
+export const cancelAppointment = async (req: Request, res: Response) => {
     try {
         for(let eventId of req.body.events) {
             let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId);
@@ -109,7 +109,7 @@ export const cancelAppointment = async (req: Request, res: Response, next: Funct
                 notify(notificationData, req.user.title, req.body.reason, 'Отмена события: ', useCancelTemplate)
             }
           }
-          next();
+          res.end();
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();

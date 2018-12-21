@@ -21,8 +21,8 @@ host.post('/event', hostController.addAppointment);
 
 host.get('/events', hostController.getAppointments);
 
-host.put('/cancel', hostController.cancelAppointment, (req, res) => { res.end()});
+host.put('/cancel', hostController.cancelAppointment);
 
 host.put('/attended', hostController.markAttended);
 
-host.put('/reschedule', hostController.cancelAppointment, (req, res) => {res.redirect('/' + req.user.username)});
+host.put('/reschedule', hostController.cancelAppointment);
