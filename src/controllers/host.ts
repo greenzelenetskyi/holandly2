@@ -97,7 +97,7 @@ export const getAppointments = async (req: Request, res: Response) => {
         appointments[1].insertion_time = +appointments[1].insertion_time;
         res.json(appointments);
     } catch (err) {
-        logger.error(err);
+        logger.error(err.message);
         res.status(500).end();
     }
 }

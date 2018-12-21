@@ -29,6 +29,7 @@ CREATE TABLE `host` (
   `configuration` json DEFAULT NULL,
   `privatedata` json DEFAULT NULL,
   `publicdata` json DEFAULT NULL,
+  `title` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`userid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -39,7 +40,7 @@ CREATE TABLE `host` (
 
 LOCK TABLES `host` WRITE;
 /*!40000 ALTER TABLE `host` DISABLE KEYS */;
-INSERT INTO `host` VALUES (1,'shpp','hola4','{\"users\": {\"shpp\": {\"types\": {\"grownups\": {\"form\": {\"fields\": [{\"type\": \"text\", \"label\": \"Имя И фамилия\", \"regex\": \".+ .+\", \"minLen\": 5}, {\"type\": \"text\", \"label\": \"email\", \"regex\": \".*@.*\\\\..*\"}]}, \"path\": \"exam\", \"color\": \"#00ffff\", \"title\": \"[7-11 лет] Вступительный тест\", \"secret\": false, \"enabled\": true, \"location\": \"Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж\", \"override\": {\"exactday\": {\"2018.11.11\": {\"slots\": []}, \"2018.11.12\": {\"reuse\": \"2018.11.11\"}}}, \"canCancel\": true, \"rangeDays\": 15, \"recurring\": {\"weekly\": {\"days\": [{\"slots\": [{\"time\": \"10:00\"}, {\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}, {\"time\": \"17:00\"}]}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"slots\": [{\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}]}]}}, \"description\": \"Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз\", \"durationMinutes\": 120, \"cancellationPolicy\": \"...\", \"concurrentVisitors\": 2}}, \"timezone\": \"GMT+3\", \"toplevel\": {\"title\": \"Школа программирования Ш++\", \"endmessage\": \"Спасибо за регистрацию!\", \"description\": \"Добро пожаловать! Выберите, пожалуйста, удобную для вас дату и время\"}}}}','{\"webhookUrl\": \"http://....{{}}\", \"redirectOnConfirmation\": \"http://....\"}','{\"users\": {\"shpp\": {\"types\": {\"grownups\": {\"form\": {\"fields\": [{\"type\": \"text\", \"label\": \"Имя И фамилия\", \"regex\": \".+ .+\", \"minLen\": 5}, {\"type\": \"text\", \"label\": \"email\", \"regex\": \".*@.*\\\\..*\"}]}, \"path\": \"exam\", \"color\": \"#00ffff\", \"title\": \"[7-11 лет] Вступительный тест\", \"secret\": false, \"enabled\": true, \"location\": \"Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж\", \"override\": {\"exactday\": {\"2018.11.11\": {\"slots\": []}, \"2018.11.12\": {\"reuse\": \"2018.11.11\"}}}, \"canCancel\": true, \"rangeDays\": 15, \"recurring\": {\"weekly\": {\"days\": [{\"slots\": [{\"time\": \"10:00\"}, {\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}, {\"time\": \"17:00\"}]}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"slots\": [{\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}]}]}}, \"description\": \"Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз\", \"durationMinutes\": 120, \"cancellationPolicy\": \"...\", \"concurrentVisitors\": 2}}, \"timezone\": \"GMT+3\", \"toplevel\": {\"title\": \"Школа программирования Ш++\", \"endmessage\": \"Спасибо за регистрацию!\", \"description\": \"Добро пожаловать! Выберите, пожалуйста, удобную для вас дату и время\"}}}}');
+INSERT INTO `host` VALUES (1,'shpp','hola4','{\"types\": {\"grownups\": {\"form\": {\"fields\": [{\"type\": \"text\", \"label\": \"Имя И фамилия\", \"regex\": \".+ .+\", \"minLen\": 5}, {\"type\": \"text\", \"label\": \"email\", \"regex\": \".*@.*\\\\..*\"}]}, \"path\": \"exam\", \"color\": \"#00ffff\", \"title\": \"[7-11 лет] Вступительный тест\", \"secret\": false, \"enabled\": true, \"location\": \"Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж\", \"override\": {\"exactday\": {\"2018.11.11\": {\"slots\": []}, \"2018.11.12\": {\"reuse\": \"2018.11.11\"}}}, \"canCancel\": true, \"rangeDays\": 15, \"recurring\": {\"weekly\": {\"days\": [{\"slots\": [{\"time\": \"10:00\"}, {\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}, {\"time\": \"17:00\"}]}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"slots\": [{\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}]}]}}, \"description\": \"Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз\", \"durationMinutes\": 120, \"cancellationPolicy\": \"...\", \"concurrentVisitors\": 2}}, \"timezone\": \"GMT+3\", \"toplevel\": {\"title\": \"Школа программирования Ш++\", \"endmessage\": \"Спасибо за регистрацию!\", \"description\": \"Добро пожаловать! Выберите, пожалуйста, удобную для вас дату и время\"}}','{\"webhookUrl\": \"http://....{{}}\", \"redirectOnConfirmation\": \"http://....\"}','{\"types\": {\"grownups\": {\"form\": {\"fields\": [{\"type\": \"text\", \"label\": \"Имя И фамилия\", \"regex\": \".+ .+\", \"minLen\": 5}, {\"type\": \"text\", \"label\": \"email\", \"regex\": \".*@.*\\\\..*\"}]}, \"path\": \"exam\", \"color\": \"#00ffff\", \"title\": \"[7-11 лет] Вступительный тест\", \"secret\": false, \"enabled\": true, \"location\": \"Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж\", \"override\": {\"exactday\": {\"2018.11.11\": {\"slots\": []}, \"2018.11.12\": {\"reuse\": \"2018.11.11\"}}}, \"canCancel\": true, \"rangeDays\": 15, \"recurring\": {\"weekly\": {\"days\": [{\"slots\": [{\"time\": \"10:00\"}, {\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}, {\"time\": \"17:00\"}]}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"reuse\": 0}, {\"slots\": [{\"time\": \"11:00\"}, {\"time\": \"12:00\"}, {\"time\": \"13:00\"}, {\"time\": \"14:00\"}, {\"time\": \"15:00\"}, {\"time\": \"16:00\"}]}]}}, \"description\": \"Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз\", \"durationMinutes\": 120, \"cancellationPolicy\": \"...\", \"concurrentVisitors\": 2}}, \"timezone\": \"GMT+3\", \"toplevel\": {\"title\": \"Школа программирования Ш++\", \"endmessage\": \"Спасибо за регистрацию!\", \"description\": \"Добро пожаловать! Выберите, пожалуйста, удобную для вас дату и время\"}}','Школа программирования Ш++');
 /*!40000 ALTER TABLE `host` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -51,7 +52,7 @@ DROP TABLE IF EXISTS `scheduled_events`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scheduled_events` (
-  `eventid` int(11) NOT NULL,
+  `eventid` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `date` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
   `time` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -60,9 +61,11 @@ CREATE TABLE `scheduled_events` (
   `userid` int(11) NOT NULL,
   `cancelledbyhost` tinyint(4) DEFAULT '0',
   `cancelledbyvisitor` tinyint(4) DEFAULT '0',
-  `showed_up` tinyint(4) DEFAULT NULL,
+  `showed_up` tinyint(4) DEFAULT '0',
+  `event_data` json NOT NULL,
+  `insertion_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`eventid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,7 +74,7 @@ CREATE TABLE `scheduled_events` (
 
 LOCK TABLES `scheduled_events` WRITE;
 /*!40000 ALTER TABLE `scheduled_events` DISABLE KEYS */;
-INSERT INTO `scheduled_events` VALUES (1,'some','07-09-1993','12:00','email@a.com','Вася',1,0,0,NULL);
+INSERT INTO `scheduled_events` VALUES (1,'some','07-12-2019','12:00','email@a.com','Вася',1,0,0,NULL,'{\"title\": \"[7-11 лет] Вступительный тест\", \"location\": \"Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж\", \"description\": \"Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз\"}','2018-12-21 12:44:48'),(2,'some other','09-10-2001','11:00','afdssad@a.com','Карась',1,1,0,0,'{\"title\": \"[7-11 лет] Вступительный тест\", \"location\": \"Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж\", \"description\": \"Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз\"}','2018-12-21 12:49:32');
 /*!40000 ALTER TABLE `scheduled_events` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -96,7 +99,7 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES ('D6JO7V2nTSFBlZ8c4SroLPwkcILgxBqs',1545073210,'{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"}}'),('MRPdE_XgLcHcvh2qLp_o4vVa4fdw2YZn',1544797558,'{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"passport\":{\"user\":{\"userId\":1,\"username\":\"shpp\"}}}');
+INSERT INTO `sessions` VALUES ('KD7ekAc7bp3j7zy6JRjQQdNo7AB999Q-',1545504712,'{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"passport\":{\"user\":{\"userId\":1,\"title\":\"Школа программирования Ш++\",\"username\":\"shpp\"}}}'),('sB65-DDHStEusXoNpLdIG-5DpPUGP68O',1545487682,'{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"}}'),('tS-o2tC57vXqbSquLP2Qa8RaItEWv7XS',1545503846,'{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"passport\":{\"user\":{\"userId\":1,\"title\":\"Школа программирования Ш++\",\"username\":\"shpp\"}}}');
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -109,4 +112,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-18 19:52:42
+-- Dump completed on 2018-12-21 20:53:04
