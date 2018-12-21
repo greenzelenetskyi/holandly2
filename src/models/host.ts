@@ -55,7 +55,7 @@ export const findDuplicate = (db: Pool, data: any) => {
 }
 
 export const markShowedUp = (db: Pool, eventid: number) => {
-  let sqlString = `UPDATE scheduled_events SET showed_up where eventid=?`;
+  let sqlString = `UPDATE scheduled_events SET showed_up=1 where eventid=?`;
   return makeSqlQuery(db, sqlString, eventid);
 }
 
