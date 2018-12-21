@@ -26,7 +26,7 @@ block block_visitors
                 data: {},
                 response: 'json',
                 success: function (data) {
-                    console.log('======> getVisitors');
+                    console.log('======> getVisitors success');
                     console.log(data);
                     table.setData(data);
                 }
@@ -40,11 +40,12 @@ block block_visitors
                 url: '/edit/cancel',
                 data: JSON.stringify({
                     'reasone': description,
-                    'eventid': id
+                    'events': id
                 }),
                 contentType: 'application/json',
                 success: function (data) {
-                    console.log(data);
+                    console.log('======> cancelVisitors success');
+                    getVisitors();
                 }
             });
         }
@@ -54,10 +55,11 @@ block block_visitors
             $.ajax({
                 type: 'put',
                 url: '/edit/attended',
-                data: JSON.stringify({'eventid': ids}),
+                data: JSON.stringify({'eventId': ids}),
                 contentType: 'application/json',
                 success: function (data) {
-                    console.log('attendedVisitors ok');
+                    console.log('attendedVisitors success');
+                    getVisitors();
                 }
             });
         }
@@ -70,7 +72,7 @@ block block_visitors
                 data: JSON.stringify({'events': id}),
                 contentType: 'application/json',
                 success: function (data) {
-                    console.log('rescheduleVisitors ok');
+                    console.log('rescheduleVisitors success');
                 }
             });
         }
