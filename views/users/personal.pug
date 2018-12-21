@@ -55,7 +55,7 @@ block block_visitors
             $.ajax({
                 type: 'put',
                 url: '/edit/attended',
-                data: JSON.stringify({'eventId': ids}),
+                data: JSON.stringify({'eventid': ids}),
                 contentType: 'application/json',
                 success: function (data) {
                     console.log('attendedVisitors success');
@@ -86,7 +86,8 @@ block block_visitors
             selectable: true,
             headerFilterPlaceholder: "Фильтр...",
             columns: [ //Define Table Columns
-                {title: "Имя и фамилия", field: "name", headerFilter: "input",},
+                {title: "", field: "attended", width:32, align:"center", formatter:"tickCross"},
+                {title: "Имя и фамилия", field: "name", headerFilter: "input"},
                 {title: "e-mail", field: "email", headerFilter: "input"},
                 {title: "Событие", field: "event", headerFilter: "input"},
                 {title: "Дата события", field: "dateEvent", sorter: "date", align: "center", headerFilter: "input"},
