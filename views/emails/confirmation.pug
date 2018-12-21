@@ -1,6 +1,6 @@
 extends custom-email
 block content
-  p Вы зарегистрированы на #{type} в #{user} #{date} в #{time}
+  p Вы зарегистрированы на #{event_data.title} в #{user} #{date} в #{time}
 block buttons  
   div(style=`margin:0;padding:0;text-align:center;`)
     p Если у вас не получается прийти:

@@ -41,15 +41,14 @@ const calendar = google.calendar('v3');
 
 export const insertToCalendar = async (newEvent: any) => {
     let dateTime = moment(newEvent.date + ' ' + newEvent.time).format();
-    let id = '1100' + newEvent.eventId;
+    //let id = '1100' + newEvent.eventId;
     try {
         let apiResponse: any = await callApi(calendar.events.insert, {
             auth: jwtClient,
             calendarId: calendId,
             resource: {
-                'id': id,
+                'id': newEvent.eventId,
                 'summary': newEvent.type,
-                'description': newEvent.description,
                 'start': {
                     'dateTime': dateTime,
                 },
@@ -64,13 +63,12 @@ export const insertToCalendar = async (newEvent: any) => {
     }
 }
 
-export const deleteCalendarEvent = async (eventData: any) => {
-    let id = '1100' + eventData;
+export const deleteCalendarEvent = async (eventId: string) => {
     try {
         let apiResponse = await callApi(calendar.events.delete, {
             auth: jwtClient,
             calendarId: calendId,
-            eventId: id
+            eventId: eventId
         });
         console.log('Event deleted');
     } catch (err) {
@@ -79,13 +77,11 @@ export const deleteCalendarEvent = async (eventData: any) => {
 }
 
 export const updateEvent = async (eventId: any, resourceFields: any) => {
-    let id = '1100' + eventId
-    console.log(resourceFields)
     try {
         let apiResponse = await callApi(calendar.events.patch, {
             auth: jwtClient,
             calendarId: calendId,
-            eventId: id,
+            eventId: eventId,
             resource: resourceFields
         });
         console.log('Event updated');

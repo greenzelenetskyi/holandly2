@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import * as hostController from '../controllers/host';
 import passport from 'passport';
 
@@ -17,11 +17,12 @@ host.get('/logout', hostController.stopSession);
 host.route('/config')
   .get(hostController.getConfigData)
   .post(hostController.setConfiguration);
-
 host.post('/event', hostController.addAppointment);
 
 host.get('/events', hostController.getAppointments);
 
-host.put('/cancel', hostController.cancelAppointment);
+host.put('/cancel', hostController.cancelAppointment, (req, res) => { res.end()});
 
 host.put('/attended', hostController.markAttended);
+
+host.put('/reschedule', hostController.cancelAppointment, (req, res) => {res.redirect('/' + req.user.username)});

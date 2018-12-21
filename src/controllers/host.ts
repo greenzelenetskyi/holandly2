@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
 import * as hostModel from '../models/host';
 import { logger } from '../config/host';
+import { notify } from '../models/mailer';
+import pug from 'pug';
+import path from 'path';
 
+const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
+const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
+const useRescheduleTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/reschedule.pug'));
 
 export const requireLogin = (req: Request, res: Response, next: Function) => {
     if (req.path == '/login') {
@@ -87,6 +93,8 @@ export const getConfigData = async (req: Request, res: Response) => {
 export const getAppointments = async (req: Request, res: Response) => {
     try {
         let appointments = await hostModel.getActiveEvents(req.app.get('dbPool'), req.user.userId);
+        appointments[0].insertion_time = +appointments[0].insertion_time;
+        appointments[1].insertion_time = +appointments[1].insertion_time;
         res.json(appointments);
     } catch (err) {
         logger.error(err);
@@ -94,11 +102,16 @@ export const getAppointments = async (req: Request, res: Response) => {
     }
 }
 
-export const cancelAppointment = async (req: Request, res: Response) => {
+export const cancelAppointment = async (req: Request, res: Response, next: Function) => {
     try {
-        for(let eventId of req.body) {
-          let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId);
-        }
+        for(let eventId of req.body.events) {
+            let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId);
+            if(result.affectedRows > 0) {
+                let notificationData = await hostModel.getEventById(req.app.get('dbPool'), eventId);
+                notify(notificationData, req.user.title, req.body.reason, 'Отмена события: ', useCancelTemplate)
+            }
+          }
+          next();
     } catch (err) {
         logger.error(err);
         res.status(500).end();
@@ -127,3 +140,4 @@ export const markAttended = async (req: Request, res: Response) => {
         res.status(500).end();
     }
 }
+
