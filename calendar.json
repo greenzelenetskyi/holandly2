@@ -31,7 +31,7 @@
           }
         ]
       },
-      "title": "[7-11 лет] Вступительный тест",
+      "title": "[14+ лет] Вступительный тест",
       "location": "Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж",
       "description": "Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз",
       "durationMinutes": 120,
@@ -94,6 +94,208 @@
                 {
                   "time": "11:00"
                 },
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "children7": {
+      "path": "children_exam",
+      "color": "#00aaaa",
+      "rangeDays": 15,
+      "canCancel": true,
+      "cancellationPolicy": "...",
+      "XredirectOnConfirmation": "http://....",
+      "enabled": true,
+      "secret": false,
+      "form": {
+        "fields": [
+          {
+            "type": "text",
+            "label": "Имя И фамилия",
+            "regex": ".+ .+",
+            "minLen": 5
+          },
+          {
+            "type": "text",
+            "label": "email",
+            "regex": ".*@.*\\..*"
+          }
+        ]
+      },
+      "title": "[7-11 лет] Вступительный тест",
+      "location": "Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж",
+      "description": "Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз",
+      "durationMinutes": 60,
+      "concurrentVisitors": 2,
+      "override": {
+        "exactday": {
+          "2018.11.11": {
+            "slots": []
+          },
+          "2018.11.12": {
+            "reuse": "2018.11.11"
+          }
+        }
+      },
+      "recurring": {
+        "weekly": {
+          "days": [
+            {
+              "slots": [
+                {
+                  "time": "9:00"
+                },
+                {
+                  "time": "10:00"
+                },
+                {
+                  "time": "11:00"
+                },
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "slots": [
+                {
+                  "time": "11:00"
+                },
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "teenagers": {
+      "path": "teen_exam",
+      "color": "#ff0000",
+      "rangeDays": 12,
+      "canCancel": false,
+      "cancellationPolicy": "...",
+      "XredirectOnConfirmation": "http://....",
+      "enabled": true,
+      "secret": false,
+      "form": {
+        "fields": [
+          {
+            "type": "text",
+            "label": "Имя И фамилия",
+            "regex": ".+ .+",
+            "minLen": 5
+          },
+          {
+            "type": "text",
+            "label": "email",
+            "regex": ".*@.*\\..*"
+          }
+        ]
+      },
+      "title": "[11-14 лет] Вступительный тест",
+      "location": "Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж",
+      "description": "Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз",
+      "durationMinutes": 90,
+      "concurrentVisitors": 2,
+      "override": {
+        "exactday": {
+          "2018.11.11": {
+            "slots": [
+              {
+              "time": "12:00"
+              }
+            ]
+          },
+          "2018.11.12": {
+            "reuse": "2018.11.11"
+          }
+        }
+      },
+      "recurring": {
+        "weekly": {
+          "days": [
+            {
+              "slots": [
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "slots": [
                 {
                   "time": "12:00"
                 },

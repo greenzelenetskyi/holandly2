@@ -23,7 +23,7 @@ export const getMainPage = (req: Request, res: Response) => {
     try {
         res.render('users/personal', { login: req.user.username });
     } catch (err) {
-        logger.error(err)
+        logger.error(err.message)
     }
 }
 
@@ -31,7 +31,7 @@ export const getLoginPage = (req: Request, res: Response) => {
     try {
         res.render('users/signIn');
     } catch (err) {
-        logger.error(err)
+        logger.error(err.message)
     }
 }
 
@@ -58,7 +58,7 @@ export const setConfiguration = async (req: Request, res: Response) => {
             res.status(400).end();
         }
     } catch (err) {
-        logger.error(err);
+        logger.error(err.message);
         res.status(500).end();
     }
 }
@@ -86,15 +86,13 @@ export const getConfigData = async (req: Request, res: Response) => {
         }
         res.status(400).end();
     } catch (err) {
-        logger.error(err);
+        logger.error(err.message);
     }
 }
 
 export const getAppointments = async (req: Request, res: Response) => {
     try {
         let appointments = await hostModel.getActiveEvents(req.app.get('dbPool'), req.user.userId);
-        appointments[0].insertion_time = +appointments[0].insertion_time;
-        appointments[1].insertion_time = +appointments[1].insertion_time;
         res.json(appointments);
     } catch (err) {
         logger.error(err.message);
@@ -113,7 +111,7 @@ export const cancelAppointment = async (req: Request, res: Response, next: Funct
           }
           next();
     } catch (err) {
-        logger.error(err);
+        logger.error(err.message);
         res.status(500).end();
     }
 }
@@ -127,7 +125,7 @@ export const addAppointment = async (req: Request, res: Response) => {
         await hostModel.insertScheduledEvent(req.app.get('dbPool'), req.body);
         res.end();
     } catch (err) {
-        logger.error(err);
+        logger.error(err.message);
         res.status(500).end();
     }
 }
@@ -136,7 +134,7 @@ export const markAttended = async (req: Request, res: Response) => {
     try {
         await hostModel.markShowedUp(req.app.get('dbPool'), req.body.eventId);
     } catch (err) {
-        logger.error(err);
+        logger.error(err.message);
         res.status(500).end();
     }
 }
