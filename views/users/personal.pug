@@ -8,12 +8,70 @@ block block_visitors
                         span.highlight 0
                 #deselect-all.a.btn.btn-outline-info Отменить выбор
                 .rouded.float-right
-                    #select-all.a.btn.btn-outline-danger Отменить участие
+                    #select-cancel.a.btn.btn-outline-danger Отменить участие
                     #select-reschedule.a.btn.btn-outline-primary Перерегистрация
-                    #select-setdone.a.btn.btn-outline-success Установить как выполнено
+                    #select-attended.a.btn.btn-outline-success Установить как выполнено
             .card-body.text-primary
                 #visitorsTable
     script.
+        $(document).ready(function () {
+            getVisitors();
+        })
+
+        function getVisitors() {
+            $.ajax({
+                type: 'get',
+                url: '/edit/events',
+                dataType: 'json',
+                data: {},
+                response: 'json',
+                success: function (data) {
+                    console.log('======> getVisitors');
+                    console.log(data);
+                    table.setData(data);
+                }
+            });
+        }
+        function cancelVisitors(id, description) {
+            console.log(id);
+            console.log(description);
+            $.ajax({
+                type: "delete",
+                url: '/edit/pattern/' + id,
+                data: JSON.stringify({'Reason': description}),
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function attendedVisitors(ids) {
+            console.log(ids);
+            $.ajax({
+                type: 'put',
+                url: '/edit/attended/',
+                data: JSON.stringify(ids),
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log('attendedVisitors ok');
+                }
+            });
+        }
+
+        function rescheduleVisitors(id) {
+            console.log(id);
+            $.ajax({
+                type: 'put',
+                url: '/edit/reschedule/',
+                data: JSON.stringify(id),
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log('rescheduleVisitors ok');
+                }
+            });
+        }
+
         var table = new Tabulator("#visitorsTable", {
             height: window.innerHeight - 400,
             layout: "fitColumns",
@@ -31,20 +89,57 @@ block block_visitors
                 {title: "Время подписки", field: "timeSign", sorter: "time", align: "center", headerFilter: "input"},
             ],
             rowSelectionChanged: function (data, rows) {
-                //update selected row counter on selection change
                 $("#select-stats span").text(' ' + data.length);
-                console.log(table.getSelectedRows());
             }
         });
-        //select row on "select all" button click
-        $("#select-all").click(function () {
-            table.selectRow();
-        });
-        //deselect row on "deselect all" button click
         $("#deselect-all").click(function () {
             table.deselectRow();
         });
-        // table.setData(testtabledata);
+        $("#select-cancel").click(function () {
+            var selected = table.getSelectedData();
+            if (selected.length > 0) {
+                console.log("=====> cancel");
+                var description = 'Отсмена участия:\n';
+                var cancelId = [];
+                selected.forEach(function (visitor) {
+                    console.log(visitor);
+                    cancelId.push(visitor.id);
+                    description += visitor.name + ' ( ' + visitor.email + ' )\n';
+                });
+                $('#descriptionText')[0].innerText = description;
+                remove = function () {
+                    cancelVisitors(ss, $("#reason").val());
+                }
+                //$.noConflict();
+                $("#remove-modal-form").modal();//.modal();
+            }
+        });
+
+        $("#select-reschedule").click(function () {
+            var selected = table.getSelectedData();
+            if (selected.length > 0) {
+                if (selected.length > 1) {
+                    alert('Перерегистрировать можно только отделно по одному участнику!')
+                }
+                else {
+                    console.log("=====> reschedule");
+                    rescheduleVisitors(selected[0].id);
+                }
+            }
+        });
+
+        $("#select-attended").click(function () {
+            var selected = table.getSelectedData();
+            if (selected.length > 0) {
+                console.log("=====> attended");
+                var cancelId = [];
+                selected.forEach(function (visitor) {
+                    console.log(visitor);
+                    cancelId.push(visitor.id);
+                });
+                attendedVisitors(cancelId);
+            }
+        });
 
 block block_patterns
     .tab-content.shadow-lg.p-3.mb-5.bg-white.rounded
@@ -53,46 +148,96 @@ block block_patterns
                 //strong Конфигурация
                 .rouded.float-right
                     #expander.a.btn.btn-outline-info Развернуть
-                    a.btn.btn-outline-success Сохранить
+                    #postConfig.a.btn.btn-outline-success Сохранить
             .card-body.text-primary
+                .input-group
+                    .input-group-prepend
+                        span.input-group-text JSON
+                    textarea#json.form-control(aria-label='JSON')
                 p.em.small.font-italic#path
                 #editor.json-editor
-        .input-group(hidden)
-            .input-group-prepend
-                span.input-group-text JSON
-            textarea#json.form-control(aria-label='JSON')
+
     script.
         function printJSON() {
-            $('#json').val(JSON.stringify(json));
+            console.log('======> printJSON');
+            console.log(json_config);
+            $('#json').val(JSON.stringify(json_config));
+            $('#editor').jsonEditor(json_config, {change: updateJSON, propertyclick: showPath});
         }
+        var json_config = {};
+
         function updateJSON(data) {
-            json = data;
-            printJSON();
+            json_config = data;
+            $('#json').val(JSON.stringify(json_config));
+            console.log('======> updateJSON');
+            console.log(data);
         }
         function showPath(path) {
             $('#path').text(path);
         }
         $(document).ready(function () {
             $('#json').change(function () {
+                console.log('======> change');
                 var val = $('#json').val();
                 if (val) {
                     try {
-                        json = JSON.parse(val);
+                        json_config = JSON.parse(val);
                     }
                     catch (e) {
                         alert('Error in parsing json. ' + e);
                     }
                 } else {
-                    json = {};
+                    json_config = {};
                 }
-                $('#editor').jsonEditor(testjson, {change: updateJSON, propertyclick: showPath});
                 printJSON();
             });
+
             $('#expander').click(function () {
                 var editor = $('#editor');
                 editor.toggleClass('expanded');
                 $(this).text(editor.hasClass('expanded') ? 'Свернуть' : 'Развернуть');
             });
-            printJSON();
-            $('#editor').jsonEditor(testjson, {change: updateJSON, propertyclick: showPath});
+
+            $("#postConfig").click(function () {
+                postConfig(json_config);
+            });
+
+            function getConfig() {
+                $.ajax({
+                    type: 'get',
+                    url: '/edit/config',
+                    dataType: 'json',
+                    data: {},
+                    response: 'json',
+                    success: function (data) {
+                        console.log('======> getConfig');
+                        console.log(data);
+                        json_config = data;
+                        printJSON();
+                    }
+                });
+            }
+
+            getConfig();
+
+            function postConfig(config) {
+                console.log('======> postConfig');
+                console.log(config);
+                $.ajax({
+                    type: 'post',
+                    url: '/edit/config',
+                    data: JSON.stringify(config),
+                    contentType: 'application/json',
+                    response: 'json',
+                    success: function (data) {
+                        console.log('======> postConfig ok');
+                    }
+                });
+            }
+
+            $(".updateData").click(function () {
+                getConfig();
+            });
+
+
         });

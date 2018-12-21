@@ -16,8 +16,8 @@ block tab_menu
                 .dropdown-menu.dropdown-menu-right
                     //a.copyLink.dropdown-item(href='#') Получить ссылку
                     a.dropdown-item(href='/'+ login) Перейти страницу подписки
-                    .dropdown-divider
-                    a.webhookSettings.dropdown-item(href='#', data-toggle="modal", data-target="#webhook-modal-form") Настройка оповещения
+                    //.dropdown-divider
+                    //a.webhookSettings.dropdown-item(href='#', data-toggle="modal", data-target="#webhook-modal-form") Настройка оповещения
                     .dropdown-divider
                     a#logOut.dropdown-item(href='#') Выход
     #nav-tabContent.tab-content
@@ -49,15 +49,16 @@ block tab_menu
                         input.btn.btn-primary(type='submit', value='Удалить')
 
 
-    //script.
-    //    $(document).ready(function () {
-    //        $('#remove-modal-form')
-    //            .on('show.bs.modal', function () {
-    //                console.log('remove-modal-form show')
-    //            })
-    //            .on('hide.bs.modal', function () {
-    //                console.log('remove-modal-form hide')
-    //            });
+    script.
+        $(document).ready(function () {
+            $('#remove-modal-form')
+                .on('show.bs.modal', function () {
+                    console.log('remove-modal-form show')
+                })
+                .on('hide.bs.modal', function () {
+                    console.log('remove-modal-form hide')
+                });
+        })
     //
     //        $('.copyLink').click(function () {
     //
