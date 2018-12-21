@@ -132,7 +132,10 @@ export const addAppointment = async (req: Request, res: Response) => {
 
 export const markAttended = async (req: Request, res: Response) => {
     try {
-        await hostModel.markShowedUp(req.app.get('dbPool'), req.body.eventId);
+        for(let id of req.body.eventId) {
+            await hostModel.markShowedUp(req.app.get('dbPool'), id);
+        }
+        res.end();
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();
