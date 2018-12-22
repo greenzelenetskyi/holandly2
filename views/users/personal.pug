@@ -6,11 +6,12 @@ block block_visitors
                 span#select-stats(style='margin:20px 20px 0 20px; font-size: 1em;')
                     a Выбрано:
                         span.highlight 0
-                #deselect-all.a.btn.btn-outline-info Отменить выбор
+                i.fa.fa-bars#deselect-all.a.btn.btn-outline-info Отменить выбор
                 .rouded.float-right
-                    #select-cancel.a.btn.btn-outline-danger Отменить участие
-                    #select-reschedule.a.btn.btn-outline-primary Перерегистрация
-                    #select-attended.a.btn.btn-outline-success Установить как выполнено
+                    i.fa.fa-times#select-cancel.a.btn.btn-outline-danger Отменить участие
+                    //i.fa.fa-exchange#select-reschedule.a.btn.btn-outline-primary Перерегистрация
+                    i.fa.fa-reply#select-reschedule.a.btn.btn-outline-primary Перерегистрация
+                    i.fa.fa-check-square-o#select-attended.a.btn.btn-outline-success Установить как выполнено
             .card-body.text-primary
                 #visitorsTable
     script.
@@ -77,16 +78,30 @@ block block_visitors
                 }
             });
         }
+        var printIcon = function (cell, formatterParams) { //plain text value
+            if (cell.getValue() === 0) {
+                return "<i class='fa fa-square-o'></i>";
+            }
+            return "<i class='fa fa-check-square-o'></i>";
+        };
 
         var table = new Tabulator("#visitorsTable", {
             height: window.innerHeight - 400,
             layout: "fitColumns",
-            movableRows: true,
+            // movableRows: true,
+            // pagination: "local",
+            // paginationSize: 6,
             // groupBy: "event",
             selectable: true,
             headerFilterPlaceholder: "Фильтр...",
+            // rowFormatter: function (row) {
+            //     if (row.getData().attended == 1) {
+            //         row.getElement().style.backgroundColor = "#98ff96";
+            //     }
+            // },
             columns: [ //Define Table Columns
-                {title: "", field: "attended", width:32, align:"center", formatter:"tickCross"},
+                {title: "", field: "attended", width: 50, align: "center", formatter: printIcon},
+                // {title: "", field: "attended", width: 32, align: "center", formatter:"tickCross"},
                 {title: "Имя и фамилия", field: "name", headerFilter: "input"},
                 {title: "e-mail", field: "email", headerFilter: "input"},
                 {title: "Событие", field: "event", headerFilter: "input"},
@@ -94,6 +109,8 @@ block block_visitors
                 {title: "Время события", field: "timeEvent", sorter: "time", align: "center", headerFilter: "input"},
                 {title: "Дата подписки", field: "dateSign", sorter: "date", align: "center", headerFilter: "input"},
                 {title: "Время подписки", field: "timeSign", sorter: "time", align: "center", headerFilter: "input"},
+
+
             ],
             rowSelectionChanged: function (data, rows) {
                 $("#select-stats span").text(' ' + data.length);
@@ -245,5 +262,6 @@ block block_patterns
 
             $(".updateData").click(function () {
                 getConfig();
+                getVisitors();
             });
         });
