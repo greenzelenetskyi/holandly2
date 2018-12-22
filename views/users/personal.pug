@@ -73,7 +73,7 @@ block block_visitors
                 contentType: 'application/json',
                 success: function (data) {
                     console.log('rescheduleVisitors success');
-                    window.location = '/edit/login'
+                    window.location = document.getElementById('subscription').href;
                 }
             });
         }
