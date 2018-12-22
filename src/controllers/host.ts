@@ -4,6 +4,7 @@ import { logger } from '../config/host';
 import { notify } from '../models/mailer';
 import pug from 'pug';
 import path from 'path';
+import { deleteCalendarEvent, insertToCalendar } from '../models/calendar';
 
 const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
@@ -105,8 +106,12 @@ export const cancelAppointment = async (req: Request, res: Response) => {
         for(let eventId of req.body.events) {
             let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId);
             if(result.affectedRows > 0) {
-                let notificationData = await hostModel.getEventById(req.app.get('dbPool'), eventId);
-                notify(notificationData, req.user.title, req.body.reason, 'Отмена события: ', useCancelTemplate)
+                let eventData = await hostModel.getEventById(req.app.get('dbPool'), eventId);
+                eventData.forEach((e: any) => {
+                    e.event_data = JSON.parse(e.event_data);
+                })
+                notify(eventData, req.user.title, req.body.reason, 'Отмена события: ', useCancelTemplate);
+                deleteCalendarEvent(eventData[0].insertion_time.valueOf().toString() + eventId);
             }
           }
           res.end();
@@ -118,11 +123,19 @@ export const cancelAppointment = async (req: Request, res: Response) => {
 
 export const addAppointment = async (req: Request, res: Response) => {
     try {
+        req.body.event_data = JSON.stringify(req.body.event_data)
         let duplicate = await hostModel.findDuplicate(req.app.get('dbPool'), req.body);
         if(duplicate.length > 0) {
             res.status(400).json({error: 'This appointment already exists'})
         }
-        await hostModel.insertScheduledEvent(req.app.get('dbPool'), req.body);
+        let result = await hostModel.insertScheduledEvent(req.app.get('dbPool'), req.body);
+        let id = result.insertId;
+        if(id != 0) {
+            let event = await hostModel.getEventById(req.app.get('dbPool'), id);
+            event[0].event_data = JSON.parse(event[0].event_data); 
+            notify(event, req.user.title, req.body.reason, 'Регистрация: ', useCancelTemplate);
+            insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
+        }
         res.end();
     } catch (err) {
         logger.error(err.message);

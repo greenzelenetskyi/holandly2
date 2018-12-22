@@ -26,3 +26,5 @@ host.put('/cancel', hostController.cancelAppointment);
 host.put('/attended', hostController.markAttended);
 
 host.put('/reschedule', hostController.cancelAppointment);
+
+host.post('/add', hostController.addAppointment);

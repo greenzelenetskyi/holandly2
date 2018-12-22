@@ -4,7 +4,11 @@ import { logger } from '../config/host';
 
 
 interface Event {
-    
+    date: string,
+    time: string,
+    email: string,
+    name: string, 
+    event_data: any
 }
 
 const calendId = process.env.CALENDAR_ID;
@@ -39,27 +43,31 @@ const callApi = (apiFunction: Function, apiObject: any) => {
 //Google Calendar API
 const calendar = google.calendar('v3');
 
-export const insertToCalendar = async (newEvent: any) => {
-    let dateTime = moment(newEvent.date + ' ' + newEvent.time).format();
-    //let id = '1100' + newEvent.eventId;
+export const insertToCalendar = async (data: Event, id: string) => {
     try {
         let apiResponse: any = await callApi(calendar.events.insert, {
             auth: jwtClient,
             calendarId: calendId,
             resource: {
-                'id': newEvent.eventId,
-                'summary': newEvent.type,
+                'id': id,
+                'summary': data.event_data.title,
                 'start': {
-                    'dateTime': dateTime,
+                    'dateTime': moment(data.date + ' ' + data.time).format()
                 },
-                'end': {
-                    'dateTime': moment(dateTime).add(newEvent.duration, 'minutes'),
-                }
+                'end' : {
+                    'dateTime' : moment(data.date + ' ' + data.time).format()
+                },
+                "attendees": [
+                    {
+                      "email": data.email,
+                      "displayName": data.name
+                    }
+                ]
             }
         });
-        //console.log('Event created: %s', apiResponse.data.htmlLink);
+        logger.info('Event created: %s', apiResponse.data.htmlLink);
     } catch (err) {
-        console.log('The API returned an error: ' + err.message);
+        logger.error('The API returned an error: ' + err.message);
     }
 }
 
@@ -70,9 +78,9 @@ export const deleteCalendarEvent = async (eventId: string) => {
             calendarId: calendId,
             eventId: eventId
         });
-        console.log('Event deleted');
+        logger.info('Event deleted');
     } catch (err) {
-        console.log('The API returned an error: ' + err.message);
+        logger.error('The API returned an error: ' + err.message);
     }
 }
 

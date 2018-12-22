@@ -50,7 +50,7 @@ export const insertScheduledEvent = (db: Pool, data: any) => {
 }
 
 export const findDuplicate = (db: Pool, data: any) => {
-  let sqlString = `SELECT eventId FROM holandly.scheduled_events WHERE type = ? && date = ? && time = && email = ?`;
+  let sqlString = `SELECT eventId FROM holandly.scheduled_events WHERE type = ? && date = ? && time = ? && email = ?`;
   return makeSqlQuery(db, sqlString, [data.type, data.date, data.time, data.email]);
 }
 
@@ -60,7 +60,7 @@ export const markShowedUp = (db: Pool, eventid: number) => {
 }
 
 export const getEventById = (db: Pool, eventid: number) => {
-    let sqlString = `SELECT name, email, date, time, event_data FROM holandly.scheduled_events WHERE eventid=?`;
+    let sqlString = `SELECT name, email, date, time, event_data, insertion_time FROM holandly.scheduled_events WHERE eventid=?`;
     return makeSqlQuery(db, sqlString, eventid);
 }
 

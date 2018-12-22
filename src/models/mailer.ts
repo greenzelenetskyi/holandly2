@@ -34,7 +34,6 @@ export const notify = async (events: TemplateVars[], name: string, explanation: 
     , emailSubject: string, useTemplate: Function) => {
     events.forEach((event: TemplateVars) => {
         event.date = moment(event.date).format('DD.MM.YYYY');
-        event.event_data = JSON.parse(event.event_data); 
         if (events[0].hasOwnProperty('before')) {
             event.before = events[0].before;
         }
