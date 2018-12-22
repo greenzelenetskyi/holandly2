@@ -1,24 +1,38 @@
-var eventType = '';
-var patternId = '';
-
-$('ul').on('click', 'li', function () {
-    var event_owner = window.eventsOwner;
-    eventType = window.eventsList[$(this).index()].event;
-    patternId = window.eventsList[$(this).index()].patternId;
-    $('.bg-modal').css('display', 'flex');
-    $('#modal-owner').text(event_owner);
-    $('#modal-desc').text("Вы уверены что хотите посетить событие " + eventType + "?");
+$(document).ready(function () {
+    currHref = $(location).attr('href');
+    var serverData = JSON.parse(window.holandlyData);
+    console.log(serverData);
+    fillHeader(serverData.toplevel);
+    fillEvents(serverData.types);
 });
 
+function fillHeader(data) {
+    $('title').html(data.title);
+    $('.increased.popover-toggle.silent.disabled').html(data.title);
+    $('.header').find('.muted').html(data.description);
+}
 
-$('.confirm').on('click', function () {
-    var currHref = $(location).attr('href');
-    if (currHref.endsWith('/')){
-        currHref = currHref.slice(0, currHref.length-1);
-    }
-    $(location).attr('href', currHref + '/' + patternId );
+function fillEvents(data){
+    var parent = $('.row');
+    $.each(data, function (index, value) {
+        if (value.enabled) {
+            var cell = $('<div>').addClass('cell');
+            var event = $('<div>').addClass('event-type js-book-button');
+            var marker = $('<div>').addClass('marker').css("background-color", value.color);
+            var lastCol = $('<div>').addClass('last-col');
+            var eventTitle = $('<h3>').html(value.title);
+            var description = $('<div>').addClass('muted').html(value.description);
+            marker.append(lastCol);
+            event.append(marker).append(eventTitle).append(description);
+            cell.append(event);
+            parent.append(cell);
+            cell.attr("href", currHref + '/' + value.path);
+        }
+    });
+}
+
+$('.row').on('click', '.cell',  function () {
+    $(location).attr('href', $(this).attr("href"));
 });
 
-$('.modal-button').on('click', function () {
-    $('.bg-modal').css('display', "none");
-});
+var currHref;
