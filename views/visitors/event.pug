@@ -1,0 +1,38 @@
+doctype html
+html
+    title
+    meta(content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1", name="viewport")
+    head
+        link(rel='stylesheet', media=screen, href='/css/visitor.css')
+    body(cz-shortcut-listen="true")
+        #page-region
+            .main-region#main-region
+                .date-time-step
+                    .header
+                        .js-profile-region
+                            .wrapper
+                                .icon-arrow-left.js-step-back.step-back
+                                .title-wrapper
+                                    div
+                                        img(class='avatar js-avatar mbs clickable', src='/img/shppLogo.png')
+                                .mbs.phs.popover-holder
+                                    .increased.popover-toggle.silent.disabled
+                    .subheader
+                        .row.wrapper
+                            .col1of2
+                                .marker
+                                .last-col
+                            .col1of2.js-timezone-toggle-region.mobile-text-left.text-right
+                                .right.mobile-full
+                                    .popover-holder= 'Время:   '
+                                        span.popover-toggle.disabled
+
+
+
+        script(src="/js/lib/jquery-3.3.1.js")
+        script(src='/js/date-time-handler.js')
+        script(src='/js/lib/moment-with-locales.js')
+        script.
+            window.holandlyUser = !{JSON.stringify(username)};
+            window.holandlyPath = !{JSON.stringify(eventType)};
+            window.holandlyData = !{JSON.stringify(userEvents.userEvents)};
