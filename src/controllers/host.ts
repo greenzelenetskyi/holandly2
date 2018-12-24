@@ -51,8 +51,8 @@ export const setConfiguration = async (req: Request, res: Response) => {
         let configuration;
         let publicData = configuration = req.body;
         filterPrivateData(publicData, privateData);
-        let status = await hostModel.updateConfig(req.app.get('dbPool'), 
-                     configuration, publicData, privateData, req.user.userId);
+        let status = await hostModel.updateConfig(req.app.get('dbPool'),
+            configuration, publicData, privateData, req.user.userId);
         if (status.affectedRows > 0) {
             res.end();
         } else {
@@ -103,9 +103,9 @@ export const getAppointments = async (req: Request, res: Response) => {
 
 export const cancelAppointment = async (req: Request, res: Response) => {
     try {
-        for(let eventId of req.body.events) {
+        for (let eventId of req.body.events) {
             let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId);
-            if(result.affectedRows > 0) {
+            if (result.affectedRows > 0) {
                 let eventData = await hostModel.getEventById(req.app.get('dbPool'), eventId);
                 eventData.forEach((e: any) => {
                     e.event_data = JSON.parse(e.event_data);
@@ -113,8 +113,8 @@ export const cancelAppointment = async (req: Request, res: Response) => {
                 notify(eventData, req.user.title, req.body.reason, 'Отмена события: ', useCancelTemplate);
                 deleteCalendarEvent(eventData[0].insertion_time.valueOf().toString() + eventId);
             }
-          }
-          res.end();
+        }
+        res.end();
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();
@@ -125,18 +125,19 @@ export const addAppointment = async (req: Request, res: Response) => {
     try {
         req.body.event_data = JSON.stringify(req.body.event_data)
         let duplicate = await hostModel.findDuplicate(req.app.get('dbPool'), req.body);
-        if(duplicate.length > 0) {
-            res.status(400).json({error: 'This appointment already exists'})
+        if (duplicate.length > 0) {
+            res.status(400).json({ error: 'This appointment already exists' })
+        } else {
+            let result = await hostModel.insertScheduledEvent(req.app.get('dbPool'), req.body);
+            let id = result.insertId;
+            if (id != 0) {
+                let event = await hostModel.getEventById(req.app.get('dbPool'), id);
+                event[0].event_data = JSON.parse(event[0].event_data);
+                await notify(event, req.user.title, req.body.reason, 'Регистрация: ', useCancelTemplate);
+                insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
+            }
+            res.end();
         }
-        let result = await hostModel.insertScheduledEvent(req.app.get('dbPool'), req.body);
-        let id = result.insertId;
-        if(id != 0) {
-            let event = await hostModel.getEventById(req.app.get('dbPool'), id);
-            event[0].event_data = JSON.parse(event[0].event_data); 
-            notify(event, req.user.title, req.body.reason, 'Регистрация: ', useCancelTemplate);
-            insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
-        }
-        res.end();
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();
@@ -145,7 +146,7 @@ export const addAppointment = async (req: Request, res: Response) => {
 
 export const markAttended = async (req: Request, res: Response) => {
     try {
-        for(let id of req.body.eventid) {
+        for (let id of req.body.eventid) {
             await hostModel.markShowedUp(req.app.get('dbPool'), id);
         }
         res.end();
