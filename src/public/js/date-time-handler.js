@@ -225,25 +225,44 @@ function buildTimeline(parent, _moment) {
     }
     parent.append(table);
 }
+
+
 // todo: optimization needed
 function timelineTable(_moment, data, table) {
-    $.each(data, function (i, value) {
+    for (var i = 0; i < data.length; i++) {
+        var value = data[i];
         var thisMoment = moment(_moment);
         thisMoment.set('hour',  +value.time.substring(0, value.time.indexOf(':')));
         thisMoment.set('minute',  +value.time.slice(-2));
         thisMoment.set('second', 0);
-        thisMoment.defaultFormat = 'DD-MM-YYYY HH:mm';
-        console.log(moment(thisMoment).isSame(scheduled_visitors[0]));
-        // for (var j = 0; j < scheduled_visitors.length; j++) {
-        //     if (thisMoment.isSame(scheduled_visitors[j])) {
-        //         console.log(scheduled_visitors[j]);
-        //     }
-        // }
-        var item = $("<li>").addClass("spot available collapsed");
-        item.append($('<button>').addClass('button js-select time-button').html(value.time).append($('<div>').addClass('status').html('available')));
-        item.append($('<button>').addClass('base button confirm-button js-confirm').html('Confirm'));
-        table.append(item);
-    });
+        if (checkScheduledUsers(thisMoment)) {
+            currDaySchedule.push(thisMoment);
+            var item = $("<li>").addClass("spot available collapsed");
+            item.append($('<button>').addClass('button js-select time-button').html(value.time).append($('<div>').addClass('status').html('available')));
+            item.append($('<button>').addClass('base button confirm-button js-confirm').html('Выбрать'));
+            table.append(item);
+        }
+    }
+}
+
+function checkScheduledUsers(_momentData){
+    for (var i = 0; i < scheduled_visitors.length; i++){
+        if (moment(_momentData.format()).isSame(scheduled_visitors[i].format())) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function buildPickerHeader(parent){
+    var head_wrapper = $('<div>').addClass('wrapper');
+    head_wrapper.append($('<div>').addClass('icon-arrow-left js-step-back step-back'));
+    head_wrapper.append($('<div>').addClass('title-wrapper'))
+        .append($('<div>').append($('<img>').addClass('avatar js-avatar mbs clickable').attr('src', '/img/shppLogo.png')))
+        .append($('<div>').addClass('mbs phs popover-holder').append($("<div>").addClass('increased popover-toggle silent disabled').html(serverData.toplevel.title)));
+    parent.append($('<div>').addClass('header')
+        .append($('<div>').addClass('js-profile-region').append(head_wrapper)));
+    parent.append($('<hr>').addClass('mbl'));
 }
 
 
@@ -264,6 +283,7 @@ $(document).on('click', '.js-day-wrapper', function () {
     var index = $(this).index();
     console.log(index);
     console.log(weekArray[index]);
+    currDaySchedule = [];
     buildTimePicker(weekArray[index], currType);
 });
 
@@ -283,8 +303,23 @@ $(document).on('click', '.icon-angle-left, .js-navigate.left', function () {
     buildNavBar(moment(m), $('.js-navigation-bar'));
 });
 
+$(document).on('click', '.spots li', function () {
+    $('li').each(function (index){
+        $(this).removeClass('selected');
+    });
+    picked = $(this).index();
+    $(this).addClass('selected');
+});
 
-
+$(document).on('click', '.js-confirm', function () {
+    console.log('--------------------------');
+    console.log(currDaySchedule[picked]);
+    var main_region = $('.main-region#main-region');
+    main_region.empty();
+    var solo = $('<div>').addClass('solo');
+    buildPickerHeader(solo);
+    main_region.append(solo);
+});
 
 // moment variable
 var m, firstDay, lastDay;
@@ -294,3 +329,5 @@ var currPageState;
 var currType;
 var weekArray;
 var scheduled_visitors;
+var currDaySchedule;
+var picked;

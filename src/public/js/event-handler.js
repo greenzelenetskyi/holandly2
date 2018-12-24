@@ -1,7 +1,8 @@
 $(document).ready(function () {
     currHref = $(location).attr('href');
-    var serverData = JSON.parse(window.holandlyData);
+    serverData = JSON.parse(window.holandlyData);
     console.log(serverData);
+    console.log(serverData.toplevel.title);
     fillHeader(serverData.toplevel);
     fillEvents(serverData.types);
 });
@@ -36,3 +37,4 @@ $('.row').on('click', '.cell',  function () {
 });
 
 var currHref;
+var serverData;
