@@ -6,6 +6,7 @@ import sessions from 'express-session';
 import { logger, dbPool, sessionConfig } from './config/host';
 import { findUser } from './models/host';
 import { host } from './routes/host';
+import { visitor } from './routes/visitor';
 import os from 'os';
 import cluster from 'cluster';
 import compression from 'compression';
@@ -78,6 +79,7 @@ if (cluster.isMaster) {
     app.use(express.static(path.join(__dirname, 'public')));
 
     app.use('/:clientname?/edit', host);
+    app.use('/', visitor);
 
     app.listen(process.env.PORT, () => {
         logger.info('The server listens to the port 8130');
