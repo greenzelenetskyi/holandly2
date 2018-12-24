@@ -265,6 +265,45 @@ function buildPickerHeader(parent){
     parent.append($('<hr>').addClass('mbl'));
 }
 
+function buildPickerWrapper(parent){
+    var wrapper = $('<div>').addClass('wrapper');
+    var enterDetails = $('<div>').addClass('adaptive enter-details row');
+    var leftCol = $('<div>').addClass('col1of2 prm');
+    leftCol.append($('<div>').addClass('mbs row')
+        .append($('<div>').addClass('marker').css('background-color', currType.color))
+        .append($('<div>').addClass('last-col').append($('<h2>').html(currType.title))));
+    leftCol.append($('<div>').addClass('emphasis iconed-text').html(currDaySchedule[picked].format('HH:mm - dddd, MMMM Do, YYYY'))
+        .append($('<i>').addClass('icon-clock')));
+    leftCol.append($('<div>').addClass('iconed-text')
+        .append($('<i>').addClass('icon-description'))
+        .append($('<div>').addClass('last-col').html(currType.description)));
+    leftCol.append($('<div>').addClass('iconed-text')
+        .append($('<i>').addClass('icon-location-target'))
+        .append($('<div>').addClass('last-col').html(currType.location)));
+    enterDetails.append(leftCol);
+    var rightCol = $('<div>').addClass('col1of2 plm');
+    rightCol.append($('<div>').addClass('hidden-tablet-up'));
+    rightCol.append($('<h2>').addClass('mbm').html("Введите ваши данные"));
+    buildApplicationForm(rightCol);
+    enterDetails.append(rightCol);
+    wrapper.append(enterDetails);
+    parent.append(wrapper);
+}
+
+function buildApplicationForm(parent){
+    var form = $('<form>').addClass('js-form');
+    form.append($('<div>').addClass('js-base-questions-region')
+        .append($('<div>')
+            .append($('<div>').addClass('field js-input-container mbm')
+                .append($('<label>').html("Имя *"))
+                .append($('<input>').addClass('js-input text').attr('type', 'text')))
+            .append($('<div>').addClass('field js-input-container mbm')
+                .append($('<label>').html("Ваш e-mail адрес *"))
+                .append($('<input>').addClass('js-input text').attr('type', 'email')))));
+    form.append($('<div>').addClass("ptm")
+        .append($('<input>').addClass('button js-loading-hide').attr('type', 'submit').attr('value', 'Спланировать')));
+    parent.append(form);
+}
 
 // listeners
 
@@ -318,6 +357,7 @@ $(document).on('click', '.js-confirm', function () {
     main_region.empty();
     var solo = $('<div>').addClass('solo');
     buildPickerHeader(solo);
+    buildPickerWrapper(solo);
     main_region.append(solo);
 });
 
