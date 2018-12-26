@@ -171,6 +171,13 @@ block block_patterns
         .card.border-primary.mb-4.shadow-lg
             .card-header
                 //strong Конфигурация
+                .rouded.float-left
+                    .input-group
+                        .input-group-prepend
+                            span.input-group-text API Key
+                        input#ApiKey.form-control(readonly='', value='-')
+                        .input-group-append
+                            #genApiKey.a.btn.btn-outline-info Генерировать
                 .rouded.float-right
                     #expander.a.btn.btn-outline-info Развернуть
                     #postConfig.a.btn.btn-outline-success Сохранить
@@ -183,6 +190,38 @@ block block_patterns
                 #editor.json-editor
 
     script.
+        function getApiKey() {
+            $.ajax({
+                type: 'GET',
+                url: '/edit/apiData',
+                dataType: 'json',
+                data: {},
+                response: 'json',
+                success: function (data) {
+                    console.log('======> getApiData');
+                    console.log(data);
+                    $('#ApiKey').val(data);
+                }
+            });
+        }
+
+        function generateApiKey() {
+            $.ajax({
+                type: "PUT",
+                url: '/edit/apiData',
+                data: {},
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log('>generateApiKey');
+                    console.log(data);
+                    $('#ApiKey').val(data);
+                }
+            });
+        }
+        $("#genApiKey").click(function () {
+            generateApiKey(json_config);
+        });
+
         function printJSON() {
             console.log('======> printJSON');
             console.log(json_config);
@@ -243,8 +282,6 @@ block block_patterns
                 });
             }
 
-            getConfig();
-
             function postConfig(config) {
                 console.log('======> postConfig');
                 console.log(config);
@@ -260,8 +297,11 @@ block block_patterns
                 });
             }
 
+            getConfig();
+
             $(".updateData").click(function () {
                 getConfig();
                 getVisitors();
+                getApiKey();
             });
         });
