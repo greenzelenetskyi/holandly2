@@ -14,6 +14,7 @@ import helmet from 'helmet';
 import passportLocal from 'passport-local';
 import path from 'path';
 import passport = require('passport');
+import { apiRouter } from './routes/api';
 const numCPUs = os.cpus().length;
 
 const LocalStrategy = passportLocal.Strategy;
@@ -79,6 +80,7 @@ if (cluster.isMaster) {
     app.use(express.static(path.join(__dirname, 'public')));
 
     app.use('/:clientname?/edit', host);
+    app.use('/api', apiRouter);
     app.use('/', visitor);
 
     app.listen(process.env.PORT, () => {
