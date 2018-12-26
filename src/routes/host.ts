@@ -2,6 +2,7 @@ import express from 'express';
 import * as hostController from '../controllers/host';
 import passport from 'passport';
 
+
 export const host = express.Router();
 
 host.use(hostController.requireLogin);
@@ -28,3 +29,8 @@ host.put('/attended', hostController.markAttended);
 host.put('/reschedule', hostController.cancelAppointment);
 
 host.post('/add', hostController.addAppointment);
+
+host.route('/token')
+  .put(hostController.createApiToken)
+  .get(hostController.getApiToken);
+

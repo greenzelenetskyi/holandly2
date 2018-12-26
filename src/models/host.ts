@@ -22,15 +22,9 @@ export const cancelAppointment = (db: Pool, eventid: number) => {
   return makeSqlQuery(db, sqlString, eventid);
 }
 
-export const updateConfig = (db: Pool, config: JSON, publicData: any, secureData: any, userId: number) => {
+export const updateHostData = (db: Pool, update: any, userId: number) => {
     let sqlString = `UPDATE host SET ? WHERE userid=?`;
-    return makeSqlQuery(db, sqlString
-      , [{
-          configuration: JSON.stringify(config), 
-          publicdata: JSON.stringify(publicData),
-          privatedata: JSON.stringify(secureData),
-          userid: userId
-        }, userId]
+    return makeSqlQuery(db, sqlString, [update, userId]
     );
 }
 
@@ -64,4 +58,7 @@ export const getEventById = (db: Pool, eventid: number) => {
     return makeSqlQuery(db, sqlString, eventid);
 }
 
-
+export const retrieveApiToken = (db: Pool, userId: number) => {
+  let sqlString = `SELECT api_token FROM holandly.host WHERE userid=?`;
+  return makeSqlQuery(db, sqlString, userId);
+}

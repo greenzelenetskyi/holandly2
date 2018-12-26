@@ -5,6 +5,8 @@ import { notify } from '../models/mailer';
 import pug from 'pug';
 import path from 'path';
 import { deleteCalendarEvent, insertToCalendar } from '../models/calendar';
+import jwt from 'jsonwebtoken';
+import { request } from "http";
 
 const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
@@ -51,8 +53,11 @@ export const setConfiguration = async (req: Request, res: Response) => {
         let configuration;
         let publicData = configuration = req.body;
         filterPrivateData(publicData, privateData);
-        let status = await hostModel.updateConfig(req.app.get('dbPool'),
-            configuration, publicData, privateData, req.user.userId);
+        let status = await hostModel.updateHostData(req.app.get('dbPool'), {
+            configuration: JSON.stringify(configuration), 
+            publicdata: JSON.stringify(publicData),
+            privatedata: JSON.stringify(privateData)
+          }, req.user.userId);
         if (status.affectedRows > 0) {
             res.end();
         } else {
@@ -133,7 +138,7 @@ export const addAppointment = async (req: Request, res: Response) => {
             if (id != 0) {
                 let event = await hostModel.getEventById(req.app.get('dbPool'), id);
                 event[0].event_data = JSON.parse(event[0].event_data);
-                await notify(event, req.user.title, req.body.reason, 'Регистрация: ', useCancelTemplate);
+                await notify(event, req.user.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
                 insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
             }
             res.end();
@@ -156,3 +161,60 @@ export const markAttended = async (req: Request, res: Response) => {
     }
 }
 
+export const createApiToken = async (req: Request, res: Response) => {
+    try {
+        let token = jwt.sign({ user: req.user.userId }
+            , process.env.API_SECRET, { algorithm: process.env.API_ALGORITHM });
+        let result = await hostModel.updateHostData(req.app.get('dbPool'), {api_token: token}, req.user.userId);
+        if(result.affectedRows > 0) {
+            res.json({apiToken: token})
+        } else {
+            res.status(400).end();
+        }
+    } catch (err) {
+        logger.error(err.message);
+        res.status(500).end();
+    }
+}
+
+export const getApiToken = async (req: Request, res: Response) => {
+    try {
+        let result = await hostModel.retrieveApiToken(req.app.get('dbPool'), req.user.userId);
+        if(result.length > 0) {
+            res.json({apiToken: result[0].api_token});
+        } else {
+            res.status(400).end();
+        }
+    } catch (err) {
+        logger.error(err.message);
+        res.status(500).end();
+    }
+}
+
+export const getEvent = async (req: Request, res: Response) => {
+    try {
+        let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId);
+        if(result.length > 0) {
+            res.json(result[0]);
+        } else {
+            res.status(400).end();
+        }
+    } catch (err) {
+        logger.error(err.message);
+        res.status(500).end();
+    }
+}
+
+export const cancelEvent = async (req: Request, res: Response) => {
+    try {
+        let result = await hostModel.cancelAppointment(req.app.get('dbPool'), req.params.eventId);
+        if(result.affectedRows > 0) {
+            res.end();
+        } else {
+            res.status(400).end();
+        }
+    } catch (err) {
+        logger.error(err.message);
+        res.status(500).end();
+    }
+}
