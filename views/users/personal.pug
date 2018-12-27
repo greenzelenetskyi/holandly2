@@ -175,9 +175,10 @@ block block_patterns
                     .input-group
                         .input-group-prepend
                             span.input-group-text API Key
-                        input#ApiKey.form-control(readonly='', value='-')
+                        input#ApiKey.small.form-control(readonly='', value='-')
                         .input-group-append
-                            #genApiKey.a.btn.btn-outline-info Генерировать
+                            #clipboardComy.fa.fa-clipboard.btn.btn-outline-info(data-tooltip="tooltip" title="Копировать ключ в бувер обмена")
+                            #genApiKey.fa.fa-refresh.btn.btn-outline-info(data-tooltip="tooltip" title="Генерировать новый ключ")
                 .rouded.float-right
                     #expander.a.btn.btn-outline-info Развернуть
                     #postConfig.a.btn.btn-outline-success Сохранить
@@ -200,7 +201,7 @@ block block_patterns
                 success: function (data) {
                     console.log('======> getApiData');
                     console.log(data);
-                    $('#ApiKey').val(data);
+                    $('#ApiKey').val(data.apiToken);
                 }
             });
         }
@@ -214,12 +215,20 @@ block block_patterns
                 success: function (data) {
                     console.log('>generateApiKey');
                     console.log(data);
-                    $('#ApiKey').val(data);
+                    $('#ApiKey').val(data.apiToken);
                 }
             });
         }
         $("#genApiKey").click(function () {
             generateApiKey(json_config);
+        });
+
+        $('#clipboardComy').click(function () {
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val($('#ApiKey').val()).select();
+            document.execCommand("copy");
+            $temp.remove();
         });
 
         function printJSON() {
