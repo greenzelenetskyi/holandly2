@@ -291,18 +291,25 @@ function buildPickerWrapper(parent){
 }
 
 function buildApplicationForm(parent){
+    currPageState = 2;
     var form = $('<form>').addClass('js-form');
     form.append($('<div>').addClass('js-base-questions-region')
         .append($('<div>')
             .append($('<div>').addClass('field js-input-container mbm')
-                .append($('<label>').html("Имя *"))
-                .append($('<input>').addClass('js-input text').attr('type', 'text')))
+                .append($('<label>').html(currType.form.fields[0].label + " *"))
+                .append($('<input>').addClass('js-input text').attr('type', currType.form.fields[0].type).attr('id', 'name')))
+            .append($('<span>').attr('data-error', 'full-name'))
             .append($('<div>').addClass('field js-input-container mbm')
-                .append($('<label>').html("Ваш e-mail адрес *"))
-                .append($('<input>').addClass('js-input text').attr('type', 'email')))));
+                .append($('<label>').html(currType.form.fields[1].label + " *"))
+                .append($('<input>').addClass('js-input text').attr('type', currType.form.fields[1].type).attr('id', 'email')))
+            .append($('<span>').attr('data-error', 'email'))));
     form.append($('<div>').addClass("ptm")
-        .append($('<input>').addClass('button js-loading-hide').attr('type', 'submit').attr('value', 'Спланировать')));
+        .append($('<input>').addClass('button js-apply-schedule').attr('type', 'submit').attr('value', 'Спланировать')));
     parent.append(form);
+    formListener(form);
+}
+
+function checkName(regexPattern){
 }
 
 // listeners
@@ -360,6 +367,32 @@ $(document).on('click', '.js-confirm', function () {
     buildPickerWrapper(solo);
     main_region.append(solo);
 });
+
+function formListener(form) {
+    form.on("submit", function (event) {
+        event.preventDefault();
+        var name = $('#name').val();
+        var email = $('#email').val();
+        var namePattern = currType.form.fields[0].regex;
+        
+    });
+}
+
+// $(document).on('click', '.js-apply-schedule', function () {
+//     var name = $('.js-input-container:eq(0)');
+//     console.log(name);
+//     // $.ajax({
+//     //     type: 'POST',
+//     //     url: '',
+//     //     data: JSON.stringify({name: inputData.name, email: inputData.email, event: inputData.event}),
+//     //     dataType: 'json',
+//     //     contentType: "application/json",
+//     //     success: function (data) {
+//     //
+//     //     }
+//     // })
+// });
+
 
 // moment variable
 var m, firstDay, lastDay;
