@@ -1,16 +1,9 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
+import { getEndpoint } from '../models/host';
+import { Pool } from 'mysql';
+import { logger } from '../config/host';
 
-let ENDPOINT = 'http://localhost:8129';
-
-interface Resource {
-  event: string,
-  pattern: string,
-  date: string,
-  time: string,
-  visitorName: string,
-  visitorEmail: string
-}
 
 export const generateApiToken = (userId: number) => {
   return new Promise((reject, resolve) => {
@@ -23,10 +16,15 @@ export const generateApiToken = (userId: number) => {
   });
 }
 
-export const sendHookData = async (resource: Resource) => {
+export const sendHookData = async (db: Pool, userId: number, resource: any) => {
   try {
-    let response = await axios.post(ENDPOINT, resource);
+    let hostData = await getEndpoint(db, userId);
+    hostData = JSON.parse(hostData[0]);
+    if(hostData.hasOwnProperty('webhookUrl')) {
+      let response = await axios.post(hostData.webhookUrl, resource);
+    }
+    
   } catch (err) {
-    console.log(err.message);
+    logger.error(err.message);
   }
 }

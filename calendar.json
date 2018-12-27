@@ -15,6 +15,7 @@
       "cancellationPolicy": "...",
       "XredirectOnConfirmation": "http://....",
       "enabled": true,
+      "api_enabled": true,
       "secret": false,
       "form": {
         "fields": [

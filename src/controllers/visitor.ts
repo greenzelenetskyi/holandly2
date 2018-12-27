@@ -7,6 +7,7 @@ import {notify} from "../models/mailer";
 import {insertToCalendar} from "../models/calendar";
 import pug from "pug";
 import path from "path";
+import { sendHookData } from "../models/api";
 
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
 
@@ -89,8 +90,9 @@ export const visitorRegistration = async (req: Request, res: Response) => {
             let toCalendar = insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
         res.end();
-    }
-    catch (err) {
+        await sendHookData(req.app.get('dbPool'), req.user.userId, {type: vtype, date: vdate, time: vtime});
+        
+    } catch (err) {
         logger.error(err.message);
         res.status(500).end();
     }

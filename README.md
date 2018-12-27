@@ -9,3 +9,4 @@ Export database:
 Add .env file to the working directory
 
 Run ./startup.sh
+
