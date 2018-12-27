@@ -10,3 +10,5 @@ visitor.get('/:userName', visitorController.getUserPage);
 visitor.get('/:userName/:type', visitorController.getVisitors);
 
 visitor.post('/sign', visitorController.visitorRegistration);
+
+visitor.post('/cancel', visitorController.visitorCancellation);

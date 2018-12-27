@@ -1,7 +1,8 @@
 import { Pool, MysqlError } from 'mysql';
-import {dbPool} from "../config/host";
-import * as moment from "moment";
-import _date = moment.unitOfTime._date;
+// import {dbPool} from "../config/host";
+// import * as moment from "moment";
+// import _date = moment.unitOfTime._date;
+// import {rejects} from "assert";
 // import {dbPool} from "../config/host";
 
 const makeSqlQueryString = (db: Pool, sqlString: string, params: string): Promise<string> => {
@@ -42,7 +43,7 @@ export const getTypeEvents = (db: Pool, userName: string, typePattern: string) =
     return makeSqlQueryEvents(db, sqlQuery, userName, typePattern)
 };
 
-const makeSqlQueryArString = (db: Pool, sqlQuery:string, params: string[]): Promise<any> => {
+const makeSqlQueryArString = (db: Pool, sqlQuery:string, params: string[] | arrayParams): Promise<any> => {
     return new Promise((resolve, reject) => {
         db.query(sqlQuery, params, (err: MysqlError, results: number) => {
             if (err) {
@@ -67,7 +68,7 @@ export const existingRecord = (db: Pool, type: string, date: string, time: strin
     return makeSqlQueryArString(db, sqlQueryDuplicate, [user, type, email, date, time]);
 };
 
-export const markCancellation = (db: Pool, type: string, date: string, email: string, user: string) => {
+export const markCancellationAll = (db: Pool, type: string, date: string, email: string, user: string) => {
     let sqlQueryCancelled = `UPDATE scheduled_events e LEFT JOIN host h ON e.userid = h.userid
                              SET e.cancelledbyvisitor = 1
                              WHERE h.username = ?
@@ -79,12 +80,33 @@ export const markCancellation = (db: Pool, type: string, date: string, email: st
     return makeSqlQueryArString(db, sqlQueryCancelled, [user, type, email, date]);
 };
 
-export const visitorRecord = (db: Pool, type: string, date: string, time: string, email: string, name: string, user: string) => {
+export const markCancellation = (db: Pool, type: string, date: string, time: string, email: string, user: string) => {
+    let sqlQueryCancelled = `UPDATE scheduled_events e LEFT JOIN host h ON e.userid = h.userid
+                             SET e.cancelledbyvisitor = 1
+                             WHERE h.username = ?
+                               AND e.type = ?
+                               AND e.email = ?
+                               AND e.date = ?
+                               AND e.time = ?
+                               AND e.cancelledbyhost = 0
+                               AND e.cancelledbyvisitor = 0`;
+    return makeSqlQueryArString(db, sqlQueryCancelled, [user, type, email, date, time]);
+};
+
+export const visitorRecord = (db: Pool, type: string, date: string, time: string, email: string, name: string, user: string): Promise<any> => {
     let sqlQueryData = `SELECT userid AS usId, publicdata AS pubData
                         FROM host
                         WHERE user = ?`;
     let sqlQueryRecord = `INSERT INTO scheduled_events (type, date, time, email, name, userid, event_data)
                           VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    return new Promise(((resolve, reject) => {
+        db.query(sqlQueryData, [user], function (err: MysqlError, eventData: { usId: number, publicdata: JSON }) {
+            if (err) {
+                return reject(err)
+            }
+            return makeSqlQueryArString(db, sqlQueryRecord, [type, date, time, email, name, eventData.usId, eventData.publicdata]);
+        });
+    }))
 };
 
 //  *******************  Used types  ***********************************************
@@ -93,5 +115,7 @@ type eventForTimeline = {
     date: Date, time: string };
 
 type timelineEvents = [eventForTimeline];
+
+type arrayParams = [string, string, string, string, string, number, JSON];
 
 //  *******************  End of used types  ****************************************

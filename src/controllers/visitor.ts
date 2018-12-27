@@ -1,7 +1,14 @@
 import { Request, Response } from "express";
 import * as visitorModel from '../models/visitor';
 import {dbPool, logger} from '../config/host';
-import {type} from "os";
+// import {type} from "os";
+import * as hostModel from "../models/host";
+import {notify} from "../models/mailer";
+import {insertToCalendar} from "../models/calendar";
+import pug from "pug";
+import path from "path";
+
+const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
 
 /**
  * Give to a visitor a page without specifying user.
@@ -11,7 +18,8 @@ export const getTitlePage = (req: Request, res: Response) => {
         res.render('visitors/index', {title: 'Main page'})
     }
     catch (err) {
-        logger.error(err)
+        logger.error(err.message);
+        res.status(500).end();
     }
 };
 
@@ -25,7 +33,8 @@ export const getUserPage = async (req: Request, res: Response) => {
         res.render('visitors/index', {username: usr, userEvents: userEvents[0]})
     }
     catch (err) {
-        logger.error(err)
+        logger.error(err.message);
+        res.status(500).end();
     }
 };
 
@@ -43,7 +52,8 @@ export const getVisitors = async (req: Request, res: Response) => {
         res.render('visitors/event', {username: usr, eventType: path, userEvents: userEvents[0], typeEvents: typeEvents});
     }
     catch (err) {
-        logger.error(err)
+        logger.error(err.message);
+        res.status(500).end();
     }
 };
 
@@ -67,12 +77,39 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         // Marking the cancellation of such records.
         let currentDay = new Date();
         currentDay.setHours(0, 0, 0, 0);
-        await visitorModel.markCancellation(req.app.get('dbPool'), vtype, currentDay.toString(), vemail, vuser);
+        await visitorModel.markCancellationAll(req.app.get('dbPool'), vtype, currentDay.toString(), vemail, vuser);
 
         // Record visitor to the event.
         let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vname, vuser);
+        let id = recVisitor.insertId;
+        if (id != 0) {
+            let event = await hostModel.getEventById(req.app.get('dbPool'), id);
+            event[0].event_data = JSON.parse(event[0].event_data);
+            await notify(event, req.user.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
+            let toCalendar = insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
+        }
+        res.end();
     }
     catch (err) {
-        logger.error(err)
+        logger.error(err.message);
+        res.status(500).end();
+    }
+};
+
+/**
+ * Cancel visitor from the event.
+ */
+export const visitorCancellation = async (req: Request, res: Response) => {
+    let vtype = req.body.type;
+    let vdate = req.body.date;
+    let vtime = req.body.time;
+    let vemail = req.body.email;
+    let vuser = req.body.userName;
+    try {
+        await visitorModel.markCancellation(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vuser);
+    }
+    catch (err) {
+        logger.error(err.message);
+        res.status(500).end();
     }
 };
