@@ -223,6 +223,14 @@ block block_patterns
             generateApiKey(json_config);
         });
 
+        $('#clipboardComy').click(function () {
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val($('#ApiKey').val()).select();
+            document.execCommand("copy");
+            $temp.remove();
+        });
+
         function printJSON() {
             console.log('======> printJSON');
             console.log(json_config);
