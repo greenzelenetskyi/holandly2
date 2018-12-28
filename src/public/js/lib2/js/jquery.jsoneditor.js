@@ -72,7 +72,7 @@
     }
 
     var types = 'object array boolean number string null';
-    var path_div = '.';
+    var path_div = ':~:';
     // Feeds object `o` with `value` at `path`. If value argument is omitted,
     // object at `path` will be deleted from `o`.
     // Example:
