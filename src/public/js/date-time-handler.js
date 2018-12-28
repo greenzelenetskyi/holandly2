@@ -6,9 +6,7 @@ $(document).ready(function () {
     serverData = JSON.parse(window.holandlyData);
     scheduled_visitors = [];
     formatScheduledVis(window.holandlyEvents, scheduled_visitors);
-    console.log(scheduled_visitors);
     var currEvent = window.holandlyPath;
-    console.log(serverData);
     fillHeader(serverData.toplevel);
     currType = findEventByPath(serverData.types, currEvent);
     lastDay = moment().add(currType.rangeDays, 'days');
@@ -42,15 +40,21 @@ function fillSubheader(data) {
     }, 30000);
 }
 
+/** in case if current user has no any event by inserted path - base location is changing to user's full events list, in other case visitor can proceed his work with picked event.
+ * @param data user events configuration.
+ * @param path current location path user trying to access.
+ * @returns {*} event configuration in case if event by current path is exists.
+ */
 function findEventByPath(data, path){
     var result;
-    // todo: make this more safely and stable
     $.each(data, function (index, value) {
         if (value.path === path){
             result = value;
         }
     });
-    return result;
+    if (result !== undefined && result !== null)
+        return result;
+    else $(location).attr('href', currHref.substring(0, currHref.lastIndexOf('/')));
 }
 
 function buildWrapper(data) {
@@ -158,21 +162,20 @@ function checkDayAvailability(data, _moment) {
     return (daysSetup[dayOfTheWeek] !== undefined && daysSetup[dayOfTheWeek] !== null);
 }
 
-// todo: optimize
 function buildWeeksRegion(parent) {
     var weeksRegion = $('<div>').addClass('centered js-weeks-region');
     var lDivision = $('<div>').addClass('division size'+(separator+1)+'of7');
-    lDivision.append($('<span>').addClass('label').html('текущ. неделя'));
-    weeksRegion.append($('<div>').append($('<div>').addClass('scale').append(lDivision)));
+    lDivision.append($('<span>').addClass('label').html(weeksRegionCounter < 2 ? weeksRegionModal[weeksRegionCounter] : weeksRegionCounter + weeksRegionModal[2]));
     var rDivision = $('<div>').addClass((6-separator) !== 0 ? 'division size'+(6-separator)+'of7' : "");
     if (rDivision.hasClass('division')) {
-        rDivision.append($('<span>').addClass('label').html('след. неделя'));
-        weeksRegion.append(rDivision);
+        rDivision.append($('<span>').addClass('label').html((weeksRegionCounter+1) < 2 ? weeksRegionModal[weeksRegionCounter+1] : (1+weeksRegionCounter) + weeksRegionModal[2]));
     }
+    weeksRegion.append($('<div>').append($('<div>').addClass('scale')
+        .append(lDivision)
+        .append(rDivision)));
     parent.append(weeksRegion);
 }
 
-// todo: optimize
 function buildNavBar(_moment, parent) {
     parent.empty();
     var lNav = $('<strong>').addClass('js-navigate left').css('visibility', 'visible');
@@ -304,7 +307,7 @@ function buildApplicationForm(parent){
                 .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[1].type, 'id': 'email'})))
             .append($('<span>').attr('data-error', 'email'))));
     form.append($('<div>').addClass("ptm")
-        .append($('<input>').addClass('button js-apply-schedule').attr('type', 'submit').attr('value', 'Спланировать')));
+        .append($('<input>').addClass('button js-apply-schedule').attr({'type': 'submit', 'value': 'Спланировать'})));
     parent.append(form);
     formListener(form);
 }
@@ -367,6 +370,7 @@ $(document).on('click', '.js-day-wrapper', function () {
 $(document).on('click', '.icon-angle-right, .js-navigate.right', function () {
     var parent = $('.week-view');
     m.add(7, 'days');
+    weeksRegionCounter++;
     buildWeekView(currType, parent);
     buildNavBar(moment(m), $('.js-navigation-bar'));
 });
@@ -376,12 +380,13 @@ $(document).on('click', '.icon-angle-left, .js-navigate.left', function () {
     if ($(this).hasClass('disabled'))
         return;
     m.subtract(7, 'days');
+    weeksRegionCounter--;
     buildWeekView(currType, parent);
     buildNavBar(moment(m), $('.js-navigation-bar'));
 });
 
 $(document).on('click', '.spots li', function () {
-    $('li').each(function (index){
+    $('li').each(function (){
         $(this).removeClass('selected');
     });
     picked = $(this).index();
@@ -429,22 +434,6 @@ function sendData(inputData){
     })
 }
 
-// $(document).on('click', '.js-apply-schedule', function () {
-//     var name = $('.js-input-container:eq(0)');
-//     console.log(name);
-//     // $.ajax({
-//     //     type: 'POST',
-//     //     url: '',
-//     //     data: JSON.stringify({name: inputData.name, email: inputData.email, event: inputData.event}),
-//     //     dataType: 'json',
-//     //     contentType: "application/json",
-//     //     success: function (data) {
-//     //
-//     //     }
-//     // })
-// });
-
-
 // moment variable
 var m, firstDay, lastDay;
 var serverData;
@@ -455,3 +444,5 @@ var weekArray;
 var scheduled_visitors;
 var currDaySchedule;
 var picked;
+var weeksRegionModal = ['текущ. неделя', 'след. неделя', ' нед. спустя'];
+var weeksRegionCounter = 0;
