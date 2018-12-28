@@ -16,6 +16,11 @@ $(document).ready(function () {
     currPageState = 1;
 });
 
+function getOverrideData(currEvntOverride){
+    var keys = Object.keys(currEvntOverride);
+    var values = Object.values(currEvntOverride);
+}
+
 function formatScheduledVis(data, schedVis) {
     if (data.length === 0)
         return;
