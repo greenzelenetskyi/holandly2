@@ -297,11 +297,11 @@ function buildApplicationForm(parent){
         .append($('<div>')
             .append($('<div>').addClass('field js-input-container mbm')
                 .append($('<label>').html(currType.form.fields[0].label + " *"))
-                .append($('<input>').addClass('js-input text').attr('type', currType.form.fields[0].type).attr('id', 'name')))
+                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[0].type, 'id': 'name'})))
             .append($('<span>').attr('data-error', 'full-name'))
             .append($('<div>').addClass('field js-input-container mbm')
                 .append($('<label>').html(currType.form.fields[1].label + " *"))
-                .append($('<input>').addClass('js-input text').attr('type', currType.form.fields[1].type).attr('id', 'email')))
+                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[1].type, 'id': 'email'})))
             .append($('<span>').attr('data-error', 'email'))));
     form.append($('<div>').addClass("ptm")
         .append($('<input>').addClass('button js-apply-schedule').attr('type', 'submit').attr('value', 'Спланировать')));
@@ -309,7 +309,38 @@ function buildApplicationForm(parent){
     formListener(form);
 }
 
-function checkName(regexPattern){
+function buildSuccessPage(){
+    var mainReg = $('.main-region');
+    mainReg.empty();
+    var div = $('<div>');
+    var header = $('<div>').addClass('header');
+    header.append($('<h2>').addClass('pts').html('Успешно'));
+    header.append($('<div>').addClass('mbs phl').html('Вы записались в ' + serverData.toplevel.title));
+    div.append(header);
+    var narrowerWrapper = $('<div>').addClass('narrower wrapper');
+    narrowerWrapper.append($('<hr>').addClass('dotted mbm'));
+    narrowerWrapper.append($('<div>').addClass('mbs row')
+        .append($('<div>').addClass('marker').css('background-color', currType.color))
+        .append($('<div>').addClass('last-col').html(currType.title)));
+    narrowerWrapper.append($('<div>').addClass('emphasis iconed-text').html(currDaySchedule[picked].format('HH:mm - dddd, MMMM Do, YYYY'))
+        .append($('<i>').addClass('icon-clock')));
+    narrowerWrapper.append($('<div>').addClass('iconed-text')
+        .append($('<i>').addClass('icon-description'))
+        .append($('<div>').addClass('last-col').html(currType.description)));
+    narrowerWrapper.append($('<div>').addClass('iconed-text')
+        .append($('<i>').addClass('icon-location-target'))
+        .append($('<div>').addClass('last-col').html(currType.location)));
+    narrowerWrapper.append($('<div>').addClass('text-center')
+        .append($('<strong>'))
+        .append($('<div>').addClass('pvl')
+            .append($('<strong>').html('Приглашение было выслано на ваш почтовый ящик.')))
+        .append($('<hr>').addClass('dotted mbl')));
+    div.append(narrowerWrapper);
+    mainReg.append(div);
+}
+
+function buildReschedulingPage(){
+
 }
 
 // listeners
@@ -373,9 +404,29 @@ function formListener(form) {
         event.preventDefault();
         var name = $('#name').val();
         var email = $('#email').val();
-        var namePattern = currType.form.fields[0].regex;
-        
+        var namePattern = new RegExp(currType.form.fields[0].regex, 'g');
+        var nameError = !(namePattern.test(name) && name.length >= currType.form.fields[0].minLen);
+        var mailPattern = new RegExp(currType.form.fields[1].regex, 'g');
+        var mailError = !(mailPattern.test(email));
+        if (!nameError && !mailError)
+            sendData({name: name, email: email});
     });
+}
+
+function sendData(inputData){
+    var outputJson = {title: currType.title, location: currType.location, description: currType.description,
+    canCancel: currType.canCancel, cancellationPolicy: currType.cancellationPolicy};
+    $.ajax({
+        type: 'POST',
+        url: '/sign',
+        data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
+        name: inputData.name, email: inputData.email, userName: window.holandlyUser, event_data: outputJson}),
+        dataType: 'json',
+        contentType: "application/json",
+        success: function (data) {
+            buildSuccessPage();
+        }
+    })
 }
 
 // $(document).on('click', '.js-apply-schedule', function () {
