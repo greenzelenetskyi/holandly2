@@ -250,7 +250,7 @@ function timelineTable(_moment, data, table) {
 
 function checkScheduledUsers(_momentData){
     for (var i = 0; i < scheduled_visitors.length; i++){
-        if (moment(_momentData.format()).isSame(scheduled_visitors[i].format())) {
+        if (moment(_momentData.format()).isBefore(moment().format()) || moment(_momentData.format()).isSame(scheduled_visitors[i].format())) {
             return false;
         }
     }
