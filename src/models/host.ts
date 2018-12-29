@@ -64,6 +64,6 @@ export const retrieveApiToken = (db: Pool, userId: number) => {
 }
 
 export const getEndpoint = (db: Pool, userId: number) => {
-  let sqlString = `SELECT private_data FROM holandly.host WHERE userid=?`;
+  let sqlString = `SELECT privatedata FROM holandly.host WHERE userid=?`;
   return makeSqlQuery(db, sqlString, userId);
 }

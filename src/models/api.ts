@@ -19,12 +19,12 @@ export const generateApiToken = (userId: number) => {
 export const sendHookData = async (db: Pool, userId: number, resource: any) => {
   try {
     let hostData = await getEndpoint(db, userId);
-    hostData = JSON.parse(hostData[0]);
+    hostData = hostData[0].privatedata;
     if(hostData.hasOwnProperty('webhookUrl')) {
       let response = await axios.post(hostData.webhookUrl, resource);
     }
     
   } catch (err) {
-    logger.error(err.message);
+    logger.error("hi" + err.message);
   }
 }

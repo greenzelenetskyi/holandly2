@@ -50,13 +50,14 @@ export const stopSession = (req: Request, res: Response) => {
 export const setConfiguration = async (req: Request, res: Response) => {
     try {
         let privateData = {};
-        let configuration;
-        let publicData = configuration = req.body;
+        let publicData = req.body;
+        let configuration = {...req.body}
         filterPrivateData(publicData, privateData);
         let status = await hostModel.updateHostData(req.app.get('dbPool'), {
             configuration: JSON.stringify(configuration), 
             publicdata: JSON.stringify(publicData),
-            privatedata: JSON.stringify(privateData)
+            privatedata: JSON.stringify(privateData),
+            title: req.body.toplevel.title
           }, req.user.userId);
         if (status.affectedRows > 0) {
             res.end();
@@ -69,15 +70,20 @@ export const setConfiguration = async (req: Request, res: Response) => {
     }
 }
 
-const filterPrivateData = (config: any, secureData: any) => {
+const filterPrivateData = (config: any, secureData: any, parent?: any) => {
     for (let property in config) {
         if (config.hasOwnProperty(property)) {
             if (property.startsWith(process.env.SECRET_PREFIX)) {
-                secureData[property.substring(1)] = config[property];
+                if(parent) {
+                    secureData[parent] = secureData[parent] ? secureData[parent]: {};
+                    secureData[parent][property.substring(1)] = config[property];
+                } else {
+                    secureData[property.substring(1)] = config[property]; 
+                }
                 delete config[property];
             } else {
                 if (typeof config[property] === 'object') {
-                    filterPrivateData(config[property], secureData);
+                    filterPrivateData(config[property], secureData, property);
                 }
             }
         }
