@@ -6,9 +6,7 @@ $(document).ready(function () {
     serverData = JSON.parse(window.holandlyData);
     scheduled_visitors = [];
     formatScheduledVis(window.holandlyEvents, scheduled_visitors);
-    console.log(scheduled_visitors);
     var currEvent = window.holandlyPath;
-    console.log(serverData);
     fillHeader(serverData.toplevel);
     currType = findEventByPath(serverData.types, currEvent);
     lastDay = moment().add(currType.rangeDays, 'days');
@@ -17,6 +15,11 @@ $(document).ready(function () {
     buildWrapper(currType);
     currPageState = 1;
 });
+
+function getOverrideData(currEvntOverride){
+    var keys = Object.keys(currEvntOverride);
+    var values = Object.values(currEvntOverride);
+}
 
 function formatScheduledVis(data, schedVis) {
     if (data.length === 0)
@@ -42,15 +45,21 @@ function fillSubheader(data) {
     }, 30000);
 }
 
+/** in case if current user has no any event by inserted path - base location is changing to user's full events list, in other case visitor can proceed his work with picked event.
+ * @param data user events configuration.
+ * @param path current location path user trying to access.
+ * @returns {*} event configuration in case if event by current path is exists.
+ */
 function findEventByPath(data, path){
     var result;
-    // todo: make this more safely and stable
     $.each(data, function (index, value) {
         if (value.path === path){
             result = value;
         }
     });
-    return result;
+    if (result !== undefined && result !== null)
+        return result;
+    else $(location).attr('href', currHref.substring(0, currHref.lastIndexOf('/')));
 }
 
 function buildWrapper(data) {
@@ -158,21 +167,20 @@ function checkDayAvailability(data, _moment) {
     return (daysSetup[dayOfTheWeek] !== undefined && daysSetup[dayOfTheWeek] !== null);
 }
 
-// todo: optimize
 function buildWeeksRegion(parent) {
     var weeksRegion = $('<div>').addClass('centered js-weeks-region');
     var lDivision = $('<div>').addClass('division size'+(separator+1)+'of7');
-    lDivision.append($('<span>').addClass('label').html('текущ. неделя'));
-    weeksRegion.append($('<div>').append($('<div>').addClass('scale').append(lDivision)));
+    lDivision.append($('<span>').addClass('label').html(weeksRegionCounter < 2 ? weeksRegionModal[weeksRegionCounter] : weeksRegionCounter + weeksRegionModal[2]));
     var rDivision = $('<div>').addClass((6-separator) !== 0 ? 'division size'+(6-separator)+'of7' : "");
     if (rDivision.hasClass('division')) {
-        rDivision.append($('<span>').addClass('label').html('след. неделя'));
-        weeksRegion.append(rDivision);
+        rDivision.append($('<span>').addClass('label').html((weeksRegionCounter+1) < 2 ? weeksRegionModal[weeksRegionCounter+1] : (1+weeksRegionCounter) + weeksRegionModal[2]));
     }
+    weeksRegion.append($('<div>').append($('<div>').addClass('scale')
+        .append(lDivision)
+        .append(rDivision)));
     parent.append(weeksRegion);
 }
 
-// todo: optimize
 function buildNavBar(_moment, parent) {
     parent.empty();
     var lNav = $('<strong>').addClass('js-navigate left').css('visibility', 'visible');
@@ -247,7 +255,7 @@ function timelineTable(_moment, data, table) {
 
 function checkScheduledUsers(_momentData){
     for (var i = 0; i < scheduled_visitors.length; i++){
-        if (moment(_momentData.format()).isSame(scheduled_visitors[i].format())) {
+        if (moment(_momentData.format()).isBefore(moment().format()) || moment(_momentData.format()).isSame(scheduled_visitors[i].format())) {
             return false;
         }
     }
@@ -291,18 +299,56 @@ function buildPickerWrapper(parent){
 }
 
 function buildApplicationForm(parent){
+    currPageState = 2;
     var form = $('<form>').addClass('js-form');
     form.append($('<div>').addClass('js-base-questions-region')
         .append($('<div>')
             .append($('<div>').addClass('field js-input-container mbm')
-                .append($('<label>').html("Имя *"))
-                .append($('<input>').addClass('js-input text').attr('type', 'text')))
+                .append($('<label>').html(currType.form.fields[0].label + " *"))
+                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[0].type, 'id': 'name'})))
+            .append($('<span>').attr('data-error', 'full-name'))
             .append($('<div>').addClass('field js-input-container mbm')
-                .append($('<label>').html("Ваш e-mail адрес *"))
-                .append($('<input>').addClass('js-input text').attr('type', 'email')))));
+                .append($('<label>').html(currType.form.fields[1].label + " *"))
+                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[1].type, 'id': 'email'})))
+            .append($('<span>').attr('data-error', 'email'))));
     form.append($('<div>').addClass("ptm")
-        .append($('<input>').addClass('button js-loading-hide').attr('type', 'submit').attr('value', 'Спланировать')));
+        .append($('<input>').addClass('button js-apply-schedule').attr({'type': 'submit', 'value': 'Спланировать'})));
     parent.append(form);
+    formListener(form);
+}
+
+function buildSuccessPage(){
+    var mainReg = $('.main-region');
+    mainReg.empty();
+    var div = $('<div>');
+    var header = $('<div>').addClass('header');
+    header.append($('<h2>').addClass('pts').html('Успешно'));
+    header.append($('<div>').addClass('mbs phl').html('Вы записались в ' + serverData.toplevel.title));
+    div.append(header);
+    var narrowerWrapper = $('<div>').addClass('narrower wrapper');
+    narrowerWrapper.append($('<hr>').addClass('dotted mbm'));
+    narrowerWrapper.append($('<div>').addClass('mbs row')
+        .append($('<div>').addClass('marker').css('background-color', currType.color))
+        .append($('<div>').addClass('last-col').html(currType.title)));
+    narrowerWrapper.append($('<div>').addClass('emphasis iconed-text').html(currDaySchedule[picked].format('HH:mm - dddd, MMMM Do, YYYY'))
+        .append($('<i>').addClass('icon-clock')));
+    narrowerWrapper.append($('<div>').addClass('iconed-text')
+        .append($('<i>').addClass('icon-description'))
+        .append($('<div>').addClass('last-col').html(currType.description)));
+    narrowerWrapper.append($('<div>').addClass('iconed-text')
+        .append($('<i>').addClass('icon-location-target'))
+        .append($('<div>').addClass('last-col').html(currType.location)));
+    narrowerWrapper.append($('<div>').addClass('text-center')
+        .append($('<strong>'))
+        .append($('<div>').addClass('pvl')
+            .append($('<strong>').html('Приглашение было выслано на ваш почтовый ящик.')))
+        .append($('<hr>').addClass('dotted mbl')));
+    div.append(narrowerWrapper);
+    mainReg.append(div);
+}
+
+function buildReschedulingPage(){
+
 }
 
 // listeners
@@ -329,6 +375,7 @@ $(document).on('click', '.js-day-wrapper', function () {
 $(document).on('click', '.icon-angle-right, .js-navigate.right', function () {
     var parent = $('.week-view');
     m.add(7, 'days');
+    weeksRegionCounter++;
     buildWeekView(currType, parent);
     buildNavBar(moment(m), $('.js-navigation-bar'));
 });
@@ -338,12 +385,13 @@ $(document).on('click', '.icon-angle-left, .js-navigate.left', function () {
     if ($(this).hasClass('disabled'))
         return;
     m.subtract(7, 'days');
+    weeksRegionCounter--;
     buildWeekView(currType, parent);
     buildNavBar(moment(m), $('.js-navigation-bar'));
 });
 
 $(document).on('click', '.spots li', function () {
-    $('li').each(function (index){
+    $('li').each(function (){
         $(this).removeClass('selected');
     });
     picked = $(this).index();
@@ -361,6 +409,36 @@ $(document).on('click', '.js-confirm', function () {
     main_region.append(solo);
 });
 
+function formListener(form) {
+    form.on("submit", function (event) {
+        event.preventDefault();
+        var name = $('#name').val();
+        var email = $('#email').val();
+        var namePattern = new RegExp(currType.form.fields[0].regex, 'g');
+        var nameError = !(namePattern.test(name) && name.length >= currType.form.fields[0].minLen);
+        var mailPattern = new RegExp(currType.form.fields[1].regex, 'g');
+        var mailError = !(mailPattern.test(email));
+        if (!nameError && !mailError)
+            sendData({name: name, email: email});
+    });
+}
+
+function sendData(inputData){
+    var outputJson = {title: currType.title, location: currType.location, description: currType.description,
+    canCancel: currType.canCancel, cancellationPolicy: currType.cancellationPolicy};
+    $.ajax({
+        type: 'POST',
+        url: '/sign',
+        data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
+        name: inputData.name, email: inputData.email, userName: window.holandlyUser, event_data: outputJson}),
+        dataType: 'json',
+        contentType: "application/json",
+        success: function (data) {
+            buildSuccessPage();
+        }
+    })
+}
+
 // moment variable
 var m, firstDay, lastDay;
 var serverData;
@@ -371,3 +449,5 @@ var weekArray;
 var scheduled_visitors;
 var currDaySchedule;
 var picked;
+var weeksRegionModal = ['текущ. неделя', 'след. неделя', ' нед. спустя'];
+var weeksRegionCounter = 0;

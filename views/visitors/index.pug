@@ -27,5 +27,10 @@ html
         script(src="/js/lib/jquery-3.3.1.js")
         script(src='/js/event-handler.js')
         script.
-            window.holandlyUser = !{JSON.stringify(username)};
-            window.holandlyData= !{JSON.stringify(userEvents.userEvents)};
+            var holandlyUser = !{JSON.stringify(username)},
+                holandlyData = !{JSON.stringify(userEvents)},
+                all = $.when(holandlyUser, holandlyData);
+            all.done(function () {
+                window.holandlyUser = holandlyUser;
+                window.holandlyData= holandlyData.userEvents;
+            })

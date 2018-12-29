@@ -1,9 +1,4 @@
 import { Pool, MysqlError } from 'mysql';
-// import {dbPool} from "../config/host";
-// import * as moment from "moment";
-// import _date = moment.unitOfTime._date;
-// import {rejects} from "assert";
-// import {dbPool} from "../config/host";
 
 const makeSqlQueryString = (db: Pool, sqlString: string, params: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -17,6 +12,7 @@ const makeSqlQueryString = (db: Pool, sqlString: string, params: string): Promis
 };
 
 export const getUserEvents = (db: Pool, userName: string) => {
+
     let sqlString = `SELECT publicdata AS userEvents
                      FROM holandly.host
                      WHERE username = ?`;
@@ -93,20 +89,17 @@ export const markCancellation = (db: Pool, type: string, date: string, time: str
     return makeSqlQueryArString(db, sqlQueryCancelled, [user, type, email, date, time]);
 };
 
-export const visitorRecord = (db: Pool, type: string, date: string, time: string, email: string, name: string, user: string): Promise<any> => {
-    let sqlQueryData = `SELECT userid AS usId, publicdata AS pubData
+export const userUniqId = (db: Pool, user: string) => {
+    let sqlQueryData = `SELECT userid 
                         FROM host
-                        WHERE user = ?`;
+                        WHERE username = ?`;
+    return makeSqlQueryArString(db, sqlQueryData, [user]);
+};
+
+export const visitorRecord = (db: Pool, type: string, date: string, time: string, email: string, name: string, userid: number, eventData: string): Promise<any> => {
     let sqlQueryRecord = `INSERT INTO scheduled_events (type, date, time, email, name, userid, event_data)
                           VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    return new Promise(((resolve, reject) => {
-        db.query(sqlQueryData, [user], function (err: MysqlError, eventData: { usId: number, publicdata: JSON }) {
-            if (err) {
-                return reject(err)
-            }
-            return makeSqlQueryArString(db, sqlQueryRecord, [type, date, time, email, name, eventData.usId, eventData.publicdata]);
-        });
-    }))
+    return makeSqlQueryArString(db, sqlQueryRecord, [type, date, time, email, name, userid, eventData]);
 };
 
 //  *******************  Used types  ***********************************************
@@ -116,6 +109,6 @@ type eventForTimeline = {
 
 type timelineEvents = [eventForTimeline];
 
-type arrayParams = [string, string, string, string, string, number, JSON];
+type arrayParams = [string, string, string, string, string, number, string];
 
 //  *******************  End of used types  ****************************************

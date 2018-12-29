@@ -35,7 +35,14 @@ html
         script(src='/js/date-time-handler.js')
         script(src='/js/lib/moment-with-locales.js')
         script.
-            window.holandlyUser = !{JSON.stringify(username)};
-            window.holandlyPath = !{JSON.stringify(eventType)};
-            window.holandlyData = !{JSON.stringify(userEvents.userEvents)};
-            window.holandlyEvents = !{JSON.stringify(typeEvents)};
+            var holandlyUser = !{JSON.stringify(username)},
+                holandlyData = !{JSON.stringify(userEvents)},
+                holandlyPath = !{JSON.stringify(eventType)},
+                holandlyEvents = !{JSON.stringify(typeEvents)},
+                all = $.when(holandlyUser, holandlyData, holandlyPath, holandlyEvents);
+            all.done(function () {
+                window.holandlyUser = holandlyUser;
+                window.holandlyPath = holandlyPath;
+                window.holandlyData = holandlyData.userEvents;
+                window.holandlyEvents = holandlyEvents;
+            })
