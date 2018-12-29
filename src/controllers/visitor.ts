@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import * as visitorModel from '../models/visitor';
 import {dbPool, logger} from '../config/host';
-// import {type} from "os";
 import * as hostModel from "../models/host";
 import {notify} from "../models/mailer";
 import {insertToCalendar} from "../models/calendar";
@@ -68,20 +67,28 @@ export const visitorRegistration = async (req: Request, res: Response) => {
     let vname = req.body.name;
     let vemail = req.body.email;
     let vuser = req.body.userName;
+    let eventData = req.body.event_data;
     try {
         // Checking the existence of the visitor actual record for the current event at a different time or date.
         let existRecord = await visitorModel.existingRecord(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vuser);
-        if (existRecord.length > 0) {
-            res.status(400).json({ error: 'This visitor has already existed at this event' })
+
+        if (existRecord[0].amount > 0) {
+            res.status(400).json({ error: 'This visitor has already existed at this event' });
+            return;
         }
 
         // Marking the cancellation of such records.
         let currentDay = new Date();
         currentDay.setHours(0, 0, 0, 0);
-        await visitorModel.markCancellationAll(req.app.get('dbPool'), vtype, currentDay.toString(), vemail, vuser);
+        let markCancel = await visitorModel.markCancellationAll(req.app.get('dbPool'), vtype, currentDay.toString(), vemail, vuser);
 
         // Record visitor to the event.
-        let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vname, vuser);
+        let findUserid = await visitorModel.userUniqId(req.app.get('dbPool'), vuser);
+
+        let vuserid = findUserid[0].userid;
+        let eventInformation = JSON.stringify({'description': eventData.description, 'location': eventData.location, 'title': eventData.title});
+        let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vname, vuserid, eventInformation);
+
         let id = recVisitor.insertId;
         if (id != 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
