@@ -18,16 +18,16 @@ const mailgunOptions = {
     }
 }
 
-// const mailer = nodemailer.createTransport(mailgun(mailgunOptions));
+const mailer = nodemailer.createTransport(mailgun(mailgunOptions));
 
-const mailer = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-        user: 'hexalxyrnovz6wk6@ethereal.email',
-        pass: 'jBCaPvxe7UFeCf61VT'
-    }
-});
+// const mailer = nodemailer.createTransport({
+//     host: 'smtp.ethereal.email',
+//     port: 587,
+//     auth: {
+//         user: 'hexalxyrnovz6wk6@ethereal.email',
+//         pass: 'jBCaPvxe7UFeCf61VT'
+//     }
+// });
 
 
 export const notify = async (events: TemplateVars[], name: string, explanation: string
