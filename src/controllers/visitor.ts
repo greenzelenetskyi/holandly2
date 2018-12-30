@@ -7,6 +7,7 @@ import {insertToCalendar} from "../models/calendar";
 import pug from "pug";
 import path from "path";
 import { sendHookData } from "../models/api";
+import moment = require("moment");
 
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
 
@@ -78,14 +79,14 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         }
 
         // Marking the cancellation of such records.
-        let currentDay = new Date();
-        currentDay.setHours(0, 0, 0, 0);
-        let markCancel = await visitorModel.markCancellationAll(req.app.get('dbPool'), vtype, currentDay.toString(), vemail, vuser);
+        let findUserid = await visitorModel.userUniqId(req.app.get('dbPool'), vuser);
+        let vuserid = findUserid[0].userid;
+
+        let currentDay = moment().format('YYYYMMDD');
+
+        let markCancel = await visitorModel.markCancellationAll(req.app.get('dbPool'), vtype, currentDay, vemail, vuserid);
 
         // Record visitor to the event.
-        let findUserid = await visitorModel.userUniqId(req.app.get('dbPool'), vuser);
-
-        let vuserid = findUserid[0].userid;
         let eventInformation = JSON.stringify({'description': eventData.description, 'location': eventData.location, 'title': eventData.title});
         let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vname, vuserid, eventInformation);
 
@@ -93,12 +94,12 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         if (id != 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
-            await notify(event, req.user.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
+            await notify(event, vuser, req.body.reason, 'Регистрация: ', useConfirmTemplate);
             let toCalendar = insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
         res.end();
-        await sendHookData(req.app.get('dbPool'), req.user.userId, {type: vtype, date: vdate, time: vtime});
-        
+        await sendHookData(req.app.get('dbPool'), vuserid, {type: vtype, date: vdate, time: vtime});
+
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();
@@ -109,13 +110,9 @@ export const visitorRegistration = async (req: Request, res: Response) => {
  * Cancel visitor from the event.
  */
 export const visitorCancellation = async (req: Request, res: Response) => {
-    let vtype = req.body.type;
-    let vdate = req.body.date;
-    let vtime = req.body.time;
-    let vemail = req.body.email;
-    let vuser = req.body.userName;
     try {
-        await visitorModel.markCancellation(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vuser);
+        await visitorModel.markCancellation(req.app.get('dbPool'), req.body.eventid);
+        res.end();
     }
     catch (err) {
         logger.error(err.message);

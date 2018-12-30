@@ -35,7 +35,9 @@ export const getTypeEvents = (db: Pool, userName: string, typePattern: string) =
                     FROM holandly.scheduled_events e
                            LEFT JOIN holandly.host h ON e.userid = h.userid
                     WHERE h.username = ?
-                      AND e.type = ?`;
+                      AND e.type = ?
+                      AND e.cancelledbyhost = 0
+                      AND e.cancelledbyvisitor = 0`;
     return makeSqlQueryEvents(db, sqlQuery, userName, typePattern)
 };
 
@@ -52,8 +54,8 @@ const makeSqlQueryArString = (db: Pool, sqlQuery:string, params: string[] | arra
 
 export const existingRecord = (db: Pool, type: string, date: string, time: string, email: string, user: string) => {
     let sqlQueryDuplicate = `SELECT count(e.eventid) as amount
-                             FROM scheduled_events e
-                                    LEFT JOIN host h ON e.userid = h.userid
+                             FROM holandly.scheduled_events e
+                                    LEFT JOIN holandly.host h ON e.userid = h.userid
                              WHERE h.username = ?
                                AND e.type = ?
                                AND e.email = ?
@@ -64,42 +66,37 @@ export const existingRecord = (db: Pool, type: string, date: string, time: strin
     return makeSqlQueryArString(db, sqlQueryDuplicate, [user, type, email, date, time]);
 };
 
-export const markCancellationAll = (db: Pool, type: string, date: string, email: string, user: string) => {
-    let sqlQueryCancelled = `UPDATE scheduled_events e LEFT JOIN host h ON e.userid = h.userid
-                             SET e.cancelledbyvisitor = 1
-                             WHERE h.username = ?
-                               AND e.type = ?
-                               AND e.email = ?
-                               AND e.date >= ?
-                               AND e.cancelledbyhost = 0
-                               AND e.cancelledbyvisitor = 0`;
-    return makeSqlQueryArString(db, sqlQueryCancelled, [user, type, email, date]);
+export const markCancellationAll = (db: Pool, type: string, date: string, email: string, userid: number) => {
+
+    let sqlQueryCancelled = `UPDATE holandly.scheduled_events 
+                             SET cancelledbyvisitor = 1
+                             WHERE userid = ?
+                               AND type = ?
+                               AND email = ?
+                               AND concat(mid(date,7,4),mid(date,4,2),mid(date,1,2)) >= ?
+                               AND cancelledbyhost = 0
+                               AND cancelledbyvisitor = 0`;
+    return makeSqlQueryArString(db, sqlQueryCancelled, [userid, type, email, date]);
 };
 
-export const markCancellation = (db: Pool, type: string, date: string, time: string, email: string, user: string) => {
-    let sqlQueryCancelled = `UPDATE scheduled_events e LEFT JOIN host h ON e.userid = h.userid
-                             SET e.cancelledbyvisitor = 1
-                             WHERE h.username = ?
-                               AND e.type = ?
-                               AND e.email = ?
-                               AND e.date = ?
-                               AND e.time = ?
-                               AND e.cancelledbyhost = 0
-                               AND e.cancelledbyvisitor = 0`;
-    return makeSqlQueryArString(db, sqlQueryCancelled, [user, type, email, date, time]);
+export const markCancellation = (db: Pool, eventid: number) => {
+    let sqlQueryCancelled = `UPDATE holandly.scheduled_events 
+                             SET cancelledbyvisitor = 1
+                             WHERE eventid = ?`;
+    return makeSqlQueryArString(db, sqlQueryCancelled, [eventid]);
 };
 
 export const userUniqId = (db: Pool, user: string) => {
     let sqlQueryData = `SELECT userid 
-                        FROM host
+                        FROM holandly.host
                         WHERE username = ?`;
     return makeSqlQueryArString(db, sqlQueryData, [user]);
 };
 
 export const visitorRecord = (db: Pool, type: string, date: string, time: string, email: string, name: string, userid: number, eventData: string): Promise<any> => {
-    let sqlQueryRecord = `INSERT INTO scheduled_events (type, date, time, email, name, userid, event_data)
+    let sqlQueryRecord = `INSERT INTO holandly.scheduled_events (userid, type, date, time, email, name, event_data)
                           VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    return makeSqlQueryArString(db, sqlQueryRecord, [type, date, time, email, name, userid, eventData]);
+    return makeSqlQueryArString(db, sqlQueryRecord, [userid, type, date, time, email, name, eventData]);
 };
 
 //  *******************  Used types  ***********************************************
@@ -109,6 +106,6 @@ type eventForTimeline = {
 
 type timelineEvents = [eventForTimeline];
 
-type arrayParams = [string, string, string, string, string, number, string];
+type arrayParams = [number, string?, string?, string?, string?, string?, string?];
 
 //  *******************  End of used types  ****************************************
