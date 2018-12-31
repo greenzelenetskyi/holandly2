@@ -19,6 +19,9 @@ $(document).ready(function () {
 function getOverrideData(currEvntOverride){
     var keys = Object.keys(currEvntOverride);
     var values = Object.values(currEvntOverride);
+    for (var i = 0; i < keys.length; i++){
+        override.push({})
+    }
 }
 
 function formatScheduledVis(data, schedVis) {
@@ -254,12 +257,13 @@ function timelineTable(_moment, data, table) {
 }
 
 function checkScheduledUsers(_momentData){
+    var concurrentVis = 0;
     for (var i = 0; i < scheduled_visitors.length; i++){
-        if (moment(_momentData.format()).isBefore(moment().format()) || moment(_momentData.format()).isSame(scheduled_visitors[i].format())) {
-            return false;
+        if (moment(_momentData.format()).isSame(scheduled_visitors[i].format())) {
+            concurrentVis++;
         }
     }
-    return true;
+    return moment(_momentData.format()).isAfter(moment().format()) && (concurrentVis !== currType.concurrentVisitors);
 }
 
 function buildPickerHeader(parent){
@@ -423,6 +427,10 @@ function formListener(form) {
     });
 }
 
+function clearErrors(){
+    $('span').removeClass('error-message');
+}
+
 function sendData(inputData){
     var outputJson = {title: currType.title, location: currType.location, description: currType.description,
     canCancel: currType.canCancel, cancellationPolicy: currType.cancellationPolicy};
@@ -431,9 +439,10 @@ function sendData(inputData){
         url: '/sign',
         data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
         name: inputData.name, email: inputData.email, userName: window.holandlyUser, event_data: outputJson}),
-        dataType: 'json',
+        // dataType: 'json',
         contentType: "application/json",
         success: function (data) {
+            console.log(data);
             buildSuccessPage();
         }
     })
@@ -451,3 +460,4 @@ var currDaySchedule;
 var picked;
 var weeksRegionModal = ['текущ. неделя', 'след. неделя', ' нед. спустя'];
 var weeksRegionCounter = 0;
+var override = [];
