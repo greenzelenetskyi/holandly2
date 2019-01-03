@@ -14,7 +14,7 @@ const makeSqlQueryString = (db: Pool, sqlString: string, params: string): Promis
 export const getUserEvents = (db: Pool, userName: string) => {
 
     let sqlString = `SELECT publicdata AS userEvents
-                     FROM holandly.host
+                     FROM host
                      WHERE username = ?`;
     return makeSqlQueryString(db, sqlString, userName)
 };
@@ -32,8 +32,8 @@ const makeSqlQueryEvents = (db: Pool, sqlQuery:string, name: string, pattern: st
 
 export const getTypeEvents = (db: Pool, userName: string, typePattern: string) => {
     let sqlQuery = `SELECT e.date, e.time
-                    FROM holandly.scheduled_events e
-                           LEFT JOIN holandly.host h ON e.userid = h.userid
+                    FROM scheduled_events e
+                           LEFT JOIN host h ON e.userid = h.userid
                     WHERE h.username = ?
                       AND e.type = ?
                       AND e.cancelledbyhost = 0
@@ -54,8 +54,8 @@ const makeSqlQueryArString = (db: Pool, sqlQuery:string, params: string[] | arra
 
 export const existingRecord = (db: Pool, type: string, date: string, time: string, email: string, user: string) => {
     let sqlQueryDuplicate = `SELECT count(e.eventid) as amount
-                             FROM holandly.scheduled_events e
-                                    LEFT JOIN holandly.host h ON e.userid = h.userid
+                             FROM scheduled_events e
+                                    LEFT JOIN host h ON e.userid = h.userid
                              WHERE h.username = ?
                                AND e.type = ?
                                AND e.email = ?
@@ -68,7 +68,7 @@ export const existingRecord = (db: Pool, type: string, date: string, time: strin
 
 export const markCancellationAll = (db: Pool, type: string, date: string, email: string, userid: number) => {
 
-    let sqlQueryCancelled = `UPDATE holandly.scheduled_events 
+    let sqlQueryCancelled = `UPDATE scheduled_events 
                              SET cancelledbyvisitor = 1
                              WHERE userid = ?
                                AND type = ?
@@ -80,7 +80,7 @@ export const markCancellationAll = (db: Pool, type: string, date: string, email:
 };
 
 export const markCancellation = (db: Pool, eventid: number) => {
-    let sqlQueryCancelled = `UPDATE holandly.scheduled_events 
+    let sqlQueryCancelled = `UPDATE scheduled_events 
                              SET cancelledbyvisitor = 1
                              WHERE eventid = ?`;
     return makeSqlQueryArString(db, sqlQueryCancelled, [eventid]);
@@ -88,13 +88,13 @@ export const markCancellation = (db: Pool, eventid: number) => {
 
 export const userUniqId = (db: Pool, user: string) => {
     let sqlQueryData = `SELECT userid 
-                        FROM holandly.host
+                        FROM host
                         WHERE username = ?`;
     return makeSqlQueryArString(db, sqlQueryData, [user]);
 };
 
 export const visitorRecord = (db: Pool, type: string, date: string, time: string, email: string, name: string, userid: number, eventData: string): Promise<any> => {
-    let sqlQueryRecord = `INSERT INTO holandly.scheduled_events (userid, type, date, time, email, name, event_data)
+    let sqlQueryRecord = `INSERT INTO scheduled_events (userid, type, date, time, email, name, event_data)
                           VALUES (?, ?, ?, ?, ?, ?, ?)`;
     return makeSqlQueryArString(db, sqlQueryRecord, [userid, type, date, time, email, name, eventData]);
 };
