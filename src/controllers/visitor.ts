@@ -94,7 +94,7 @@ export const visitorRegistration = async (req: Request, res: Response) => {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
             await notify(event, req.user.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
-            let toCalendar = insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
+            let toCalendar = await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
         res.end();
         await sendHookData(req.app.get('dbPool'), req.user.userId, {type: vtype, date: vdate, time: vtime});
