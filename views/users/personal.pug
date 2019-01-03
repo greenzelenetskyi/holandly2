@@ -107,10 +107,8 @@ block block_visitors
                 {title: "Событие", field: "event", headerFilter: "input"},
                 {title: "Дата события", field: "dateEvent", sorter: "date", align: "center", headerFilter: "input"},
                 {title: "Время события", field: "timeEvent", sorter: "time", align: "center", headerFilter: "input"},
-                {title: "Дата подписки", field: "dateSign", sorter: "date", align: "center", headerFilter: "input"},
-                {title: "Время подписки", field: "timeSign", sorter: "time", align: "center", headerFilter: "input"},
-
-
+                {title: "Дата подписки", width: 320, field: "insertion_time", sorter: "date", align: "center", headerFilter: "input"},
+                // {title: "Время подписки", field: "timeSign", sorter: "time", align: "center", headerFilter: "input"},
             ],
             rowSelectionChanged: function (data, rows) {
                 $("#select-stats span").text(' ' + data.length);
