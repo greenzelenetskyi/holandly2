@@ -1,6 +1,6 @@
 import { Pool, MysqlError } from 'mysql';
 
-const makeSqlQueryString = (db: Pool, sqlString: string, params: string): Promise<string> => {
+const makeSqlQueryString = (db: Pool, sqlString: string, params: string | number): Promise<string | eventInf> => {
     return new Promise((resolve, reject) => {
         db.query(sqlString, params, (err: MysqlError, result: string) => {
             if (err) {
@@ -17,6 +17,14 @@ export const getUserEvents = (db: Pool, userName: string) => {
                      FROM host
                      WHERE username = ?`;
     return makeSqlQueryString(db, sqlString, userName)
+};
+
+export const getEventInformation = (db: Pool, event: number) => {
+    let sqlString = `SELECT h.username, h.publicdata AS userEvents
+                     FROM host h
+                            LEFT JOIN scheduled_events e ON h.userid = e.userid
+                     WHERE e.eventid = ?`;
+    return makeSqlQueryString(db, sqlString, event);
 };
 
 const makeSqlQueryEvents = (db: Pool, sqlQuery:string, name: string, pattern: string): Promise<timelineEvents> => {
@@ -102,10 +110,13 @@ export const visitorRecord = (db: Pool, type: string, date: string, time: string
 //  *******************  Used types  ***********************************************
 
 type eventForTimeline = {
-    date: Date, time: string };
+    date: Date, time: string
+};
 
 type timelineEvents = [eventForTimeline];
 
 type arrayParams = [number, string?, string?, string?, string?, string?, string?];
+
+type eventInf = [ { username: string, userEvents: string} ];
 
 //  *******************  End of used types  ****************************************

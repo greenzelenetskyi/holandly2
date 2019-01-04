@@ -45,7 +45,6 @@ export const getUserPage = async (req: Request, res: Response) => {
 export const getVisitors = async (req: Request, res: Response) => {
     let usr: string = req.params.userName;
     let path: string = req.params.type;
-    // let typePattern: string = req.params.type;
     try {
         // Getting a list of recorded events.
         let userEvents = await visitorModel.getUserEvents(req.app.get('dbPool'), usr);
@@ -62,16 +61,16 @@ export const getVisitors = async (req: Request, res: Response) => {
  * Record visitor to the event.
  */
 export const visitorRegistration = async (req: Request, res: Response) => {
-    let vtype = req.body.type;
-    let vdate = req.body.date;
-    let vtime = req.body.time;
-    let vname = req.body.name;
-    let vemail = req.body.email;
-    let vuser = req.body.userName;
+    let eventType = req.body.type;
+    let eventDate = req.body.date;
+    let eventTime = req.body.time;
+    let eventName = req.body.name;
+    let eventEmail = req.body.email;
+    let eventUser = req.body.userName;
     let eventData = req.body.event_data;
     try {
         // Checking the existence of the visitor actual record for the current event at a different time or date.
-        let existRecord = await visitorModel.existingRecord(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vuser);
+        let existRecord = await visitorModel.existingRecord(req.app.get('dbPool'), eventType, eventDate, eventTime, eventEmail, eventUser);
 
         if (existRecord[0].amount > 0) {
             res.status(400).json({ error: 'This visitor has already existed at this event' });
@@ -79,26 +78,26 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         }
 
         // Marking the cancellation of such records.
-        let findUserid = await visitorModel.userUniqId(req.app.get('dbPool'), vuser);
-        let vuserid = findUserid[0].userid;
+        let findUserId = await visitorModel.userUniqId(req.app.get('dbPool'), eventUser);
+        let userId = findUserId[0].userid;
 
         let currentDay = moment().format('YYYYMMDD');
 
-        let markCancel = await visitorModel.markCancellationAll(req.app.get('dbPool'), vtype, currentDay, vemail, vuserid);
+        await visitorModel.markCancellationAll(req.app.get('dbPool'), eventType, currentDay, eventEmail, userId);
 
         // Record visitor to the event.
         let eventInformation = JSON.stringify({'description': eventData.description, 'location': eventData.location, 'title': eventData.title});
-        let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), vtype, vdate, vtime, vemail, vname, vuserid, eventInformation);
+        let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), eventType, eventDate, eventTime, eventEmail, eventName, userId, eventInformation);
 
         let id = recVisitor.insertId;
         if (id != 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
-            await notify(event, vuser, req.body.reason, 'Регистрация: ', useConfirmTemplate);
-            let toCalendar = await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
+            await notify(event, eventUser, req.body.reason, 'Регистрация: ', useConfirmTemplate);
+            await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
         res.end();
-        await sendHookData(req.app.get('dbPool'), vuserid, {type: vtype, date: vdate, time: vtime});
+        await sendHookData(req.app.get('dbPool'), userId, {type: eventType, date: eventDate, time: eventTime});
 
     } catch (err) {
         logger.error(err.message);
@@ -113,6 +112,21 @@ export const visitorCancellation = async (req: Request, res: Response) => {
     try {
         await visitorModel.markCancellation(req.app.get('dbPool'), req.body.eventid);
         res.end();
+    }
+    catch (err) {
+        logger.error(err.message);
+        res.status(500).end();
+    }
+};
+
+/**
+ * Confirmation of the visitor failure from the event.
+ */
+export const getRejection = async (req: Request, res: Response) => {
+    let reject: number = req.params.eventId;
+    try {
+        let eventInformation = await visitorModel.getEventInformation(req.app.get('dbPool'), reject);
+        res.render('visitors/cancellation', eventInformation[0]);
     }
     catch (err) {
         logger.error(err.message);
