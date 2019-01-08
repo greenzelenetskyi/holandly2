@@ -52,10 +52,10 @@ export const insertToCalendar = async (data: Event, id: string) => {
                 'id': id,
                 'summary': data.event_data.title,
                 'start': {
-                    'dateTime': moment(data.date + ' ' + data.time, "DD-MM-YYYY HH:mm").format()
+                    'dateTime': moment(data.date + ' ' + data.time, "DD-MM-YYYY HH:mm")
                 },
                 'end' : {
-                    'dateTime' :  moment(data.date + ' ' + data.time, "DD-MM-YYYY HH:mm").format()
+                    'dateTime' :  moment(data.date + ' ' + data.time, "DD-MM-YYYY HH:mm")
                 },
                 "attendees": [
                     {

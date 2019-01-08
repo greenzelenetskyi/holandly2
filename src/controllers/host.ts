@@ -10,8 +10,6 @@ import { request } from "http";
 
 const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
-const useRescheduleTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/reschedule.pug'));
-
 export const requireLogin = (req: Request, res: Response, next: Function) => {
     if (req.path == '/login') {
         next();

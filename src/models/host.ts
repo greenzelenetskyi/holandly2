@@ -54,7 +54,7 @@ export const markShowedUp = (db: Pool, eventid: number) => {
 }
 
 export const getEventById = (db: Pool, eventid: number) => {
-    let sqlString = `SELECT name, email, date, time, event_data, insertion_time FROM scheduled_events WHERE eventid=?`;
+    let sqlString = `SELECT eventid, name, email, date, time, event_data, insertion_time FROM scheduled_events WHERE eventid=?`;
     return makeSqlQuery(db, sqlString, eventid);
 }
 
