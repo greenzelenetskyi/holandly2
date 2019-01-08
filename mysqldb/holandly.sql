@@ -16,26 +16,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `holandly`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `holandly` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
-
-USE `holandly`;
-
---
 -- Table structure for table `host`
 --
 
+DROP TABLE IF EXISTS `host`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `host` (
   `userid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `configuration` text DEFAULT NULL,
-  `privatedata` text DEFAULT NULL,
-  `publicdata` text DEFAULT NULL,
+  `configuration` json DEFAULT NULL,
+  `privatedata` json DEFAULT NULL,
+  `publicdata` json DEFAULT NULL,
   `title` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `api_token` mediumtext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`userid`),
@@ -48,6 +41,7 @@ CREATE TABLE `host` (
 -- Table structure for table `scheduled_events`
 --
 
+DROP TABLE IF EXISTS `scheduled_events`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scheduled_events` (
@@ -61,17 +55,18 @@ CREATE TABLE `scheduled_events` (
   `cancelledbyhost` tinyint(4) DEFAULT '0',
   `cancelledbyvisitor` tinyint(4) DEFAULT '0',
   `showed_up` tinyint(4) DEFAULT '0',
-  `event_data` text NOT NULL,
+  `event_data` json NOT NULL,
   `insertion_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`eventid`),
   UNIQUE KEY `eventid_UNIQUE` (`eventid`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `sessions`
 --
 
+DROP TABLE IF EXISTS `sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sessions` (
@@ -91,4 +86,4 @@ CREATE TABLE `sessions` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-29 12:18:50
+-- Dump completed on 2019-01-08  0:37:24
