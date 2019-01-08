@@ -14,3 +14,5 @@ visitor.get('/:userName/:type', visitorController.getVisitors);
 visitor.post('/sign', visitorController.visitorRegistration);
 
 visitor.post('/cancel', visitorController.visitorCancellation);
+
+visitor.get('/rejection/:eventId', visitorController.getRejection);
