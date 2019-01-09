@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
 import mailgun from 'nodemailer-mailgun-transport';
-import moment from 'moment';
 import { logger } from '../config/visitor';
 
 interface TemplateVars {
@@ -42,7 +41,7 @@ export const notify = async (events: TemplateVars[], name: string, explanation: 
             subject: emailSubject + ' ' + event.event_data.title + ' ' + event.date
                 + ' в ' + event.time,
             html: useTemplate({
-                ...event, user: name, reason: explanation, cancelLink: 'http://localhost:8130/rejection/' + event.eventid
+                ...event, user: name, reason: explanation, cancelLink: process.env.CANCEL_LINK + event.eventid
             })
         }, function (err, info) {
             if (err) {

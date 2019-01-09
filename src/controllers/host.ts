@@ -6,7 +6,6 @@ import pug from 'pug';
 import path from 'path';
 import { deleteCalendarEvent, insertToCalendar } from '../models/calendar';
 import jwt from 'jsonwebtoken';
-import { request } from "http";
 
 const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
@@ -211,9 +210,13 @@ export const getEvent = async (req: Request, res: Response) => {
 
 export const cancelEvent = async (req: Request, res: Response) => {
     try {
-        let result = await hostModel.cancelAppointment(req.app.get('dbPool'), req.params.eventId);
+        let id = req.params.eventId;
+        let result = await hostModel.cancelAppointment(req.app.get('dbPool'), id);
         if (result.affectedRows > 0) {
-            
+            let event = await hostModel.getEventById(req.app.get('dbPool'), id);
+            event[0].event_data = JSON.parse(event[0].event_data);
+            await notify(event, req.user.title, req.body.reason, 'Отмена: ', useCancelTemplate);
+            deleteCalendarEvent(event[0].insertion_time.valueOf().toString() + id);
             res.json();
         } else {
             res.status(400).end();
