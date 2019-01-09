@@ -49,14 +49,14 @@ export const setConfiguration = async (req: Request, res: Response) => {
     try {
         let privateData = {};
         let publicData = req.body;
-        let configuration = {...req.body}
+        let configuration = { ...req.body }
         filterPrivateData(publicData, privateData);
         let status = await hostModel.updateHostData(req.app.get('dbPool'), {
-            configuration: JSON.stringify(configuration), 
+            configuration: JSON.stringify(configuration),
             publicdata: JSON.stringify(publicData),
             privatedata: JSON.stringify(privateData),
             title: req.body.toplevel.title
-          }, req.user.userId);
+        }, req.user.userId);
         if (status.affectedRows > 0) {
             res.end();
         } else {
@@ -72,11 +72,11 @@ const filterPrivateData = (config: any, secureData: any, parent?: any) => {
     for (let property in config) {
         if (config.hasOwnProperty(property)) {
             if (property.startsWith(process.env.SECRET_PREFIX)) {
-                if(parent) {
-                    secureData[parent] = secureData[parent] ? secureData[parent]: {};
+                if (parent) {
+                    secureData[parent] = secureData[parent] ? secureData[parent] : {};
                     secureData[parent][property.substring(1)] = config[property];
                 } else {
-                    secureData[property.substring(1)] = config[property]; 
+                    secureData[property.substring(1)] = config[property];
                 }
                 delete config[property];
             } else {
@@ -123,7 +123,7 @@ export const cancelAppointment = async (req: Request, res: Response) => {
                 deleteCalendarEvent(eventData[0].insertion_time.valueOf().toString() + eventId);
             }
         }
-        res.end();
+        res.json();
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();
@@ -145,7 +145,7 @@ export const addAppointment = async (req: Request, res: Response) => {
                 await notify(event, req.user.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
                 insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
             }
-            res.end();
+            res.json();
         }
     } catch (err) {
         logger.error(err.message);
@@ -169,9 +169,9 @@ export const createApiToken = async (req: Request, res: Response) => {
     try {
         let token = jwt.sign({ user: req.user.userId }
             , process.env.API_SECRET, { algorithm: process.env.API_ALGORITHM });
-        let result = await hostModel.updateHostData(req.app.get('dbPool'), {api_token: token}, req.user.userId);
-        if(result.affectedRows > 0) {
-            res.json({apiToken: token})
+        let result = await hostModel.updateHostData(req.app.get('dbPool'), { api_token: token }, req.user.userId);
+        if (result.affectedRows > 0) {
+            res.json({ apiToken: token })
         } else {
             res.status(400).end();
         }
@@ -184,8 +184,8 @@ export const createApiToken = async (req: Request, res: Response) => {
 export const getApiToken = async (req: Request, res: Response) => {
     try {
         let result = await hostModel.retrieveApiToken(req.app.get('dbPool'), req.user.userId);
-        if(result.length > 0) {
-            res.json({apiToken: result[0].api_token});
+        if (result.length > 0) {
+            res.json({ apiToken: result[0].api_token });
         } else {
             res.status(400).end();
         }
@@ -198,10 +198,10 @@ export const getApiToken = async (req: Request, res: Response) => {
 export const getEvent = async (req: Request, res: Response) => {
     try {
         let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId);
-        if(result.length > 0) {
+        if (result.length > 0) {
             res.json(result[0]);
         } else {
-            res.status(400).end();
+            res.status(400).json();
         }
     } catch (err) {
         logger.error(err.message);
@@ -212,8 +212,9 @@ export const getEvent = async (req: Request, res: Response) => {
 export const cancelEvent = async (req: Request, res: Response) => {
     try {
         let result = await hostModel.cancelAppointment(req.app.get('dbPool'), req.params.eventId);
-        if(result.affectedRows > 0) {
-            res.end();
+        if (result.affectedRows > 0) {
+            
+            res.json();
         } else {
             res.status(400).end();
         }

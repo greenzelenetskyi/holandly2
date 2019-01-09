@@ -83,17 +83,3 @@ export const deleteCalendarEvent = async (eventId: string) => {
         logger.error('The API returned an error: ' + err.message);
     }
 }
-
-export const updateEvent = async (eventId: any, resourceFields: any) => {
-    try {
-        let apiResponse = await callApi(calendar.events.patch, {
-            auth: jwtClient,
-            calendarId: calendId,
-            eventId: eventId,
-            resource: resourceFields
-        });
-        console.log('Event updated');
-    } catch (err) {
-        console.log('The API returned an error: ' + err.message);
-    }
-}

@@ -96,8 +96,11 @@ export const visitorRegistration = async (req: Request, res: Response) => {
             await notify(event, eventUser, req.body.reason, 'Регистрация: ', useConfirmTemplate);
             await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
+        if(req.body.enableWebHook && req.body.enableWebHook === true) {
+            sendHookData(req.app.get('dbPool'), userId, {type: eventType, date: eventDate, time: eventTime});
+        }
         res.end();
-        await sendHookData(req.app.get('dbPool'), userId, {type: eventType, date: eventDate, time: eventTime});
+        
 
     } catch (err) {
         logger.error(err.message);
@@ -105,12 +108,16 @@ export const visitorRegistration = async (req: Request, res: Response) => {
     }
 };
 
+
 /**
  * Cancel visitor from the event.
  */
 export const visitorCancellation = async (req: Request, res: Response) => {
     try {
         await visitorModel.markCancellation(req.app.get('dbPool'), req.body.eventid);
+        if(req.body.enableWebHook && req.body.enableWebHook === true) {
+            sendHookData(req.app.get('dbPool'), req.body.userid, {type: req.body.type, date: req.body.date, time: req.body.time});
+        }
         res.end();
     }
     catch (err) {
