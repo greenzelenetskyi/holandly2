@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import * as visitorModel from '../models/visitor';
-import {dbPool, logger} from '../config/host';
+import { dbPool, logger } from '../config/host';
 import * as hostModel from "../models/host";
-import {notify} from "../models/mailer";
-import {insertToCalendar} from "../models/calendar";
+import { notify } from "../models/mailer";
+import { insertToCalendar } from "../models/calendar";
 import pug from "pug";
 import path from "path";
 import { sendHookData } from "../models/api";
@@ -16,7 +16,7 @@ const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/ema
  */
 export const getTitlePage = (req: Request, res: Response) => {
     try {
-        res.render('visitors/index', {title: 'Main page'})
+        res.render('visitors/index', { title: 'Main page' })
     }
     catch (err) {
         logger.error(err.message);
@@ -31,7 +31,7 @@ export const getUserPage = async (req: Request, res: Response) => {
     let usr: string = req.params.userName;
     try {
         let userEvents = await visitorModel.getUserEvents(req.app.get('dbPool'), usr);
-        res.render('visitors/index', {username: usr, userEvents: userEvents[0]})
+        res.render('visitors/index', { username: usr, userEvents: userEvents[0] })
     }
     catch (err) {
         logger.error(err.message);
@@ -49,7 +49,7 @@ export const getVisitors = async (req: Request, res: Response) => {
         // Getting a list of recorded events.
         let userEvents = await visitorModel.getUserEvents(req.app.get('dbPool'), usr);
         let typeEvents = await visitorModel.getTypeEvents(req.app.get('dbPool'), usr, path);
-        res.render('visitors/event', {username: usr, eventType: path, userEvents: userEvents[0], typeEvents: typeEvents});
+        res.render('visitors/event', { username: usr, eventType: path, userEvents: userEvents[0], typeEvents: typeEvents });
     }
     catch (err) {
         logger.error(err.message);
@@ -86,7 +86,7 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         await visitorModel.markCancellationAll(req.app.get('dbPool'), eventType, currentDay, eventEmail, userId);
 
         // Record visitor to the event.
-        let eventInformation = JSON.stringify({'description': eventData.description, 'location': eventData.location, 'title': eventData.title});
+        let eventInformation = JSON.stringify({ 'description': eventData.description, 'location': eventData.location, 'title': eventData.title });
         let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), eventType, eventDate, eventTime, eventEmail, eventName, userId, eventInformation);
 
         let id = recVisitor.insertId;
@@ -96,11 +96,11 @@ export const visitorRegistration = async (req: Request, res: Response) => {
             await notify(event, eventUser, req.body.reason, 'Регистрация: ', useConfirmTemplate);
             await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
-        if(req.body.enableWebHook && req.body.enableWebHook === true) {
-            sendHookData(req.app.get('dbPool'), userId, {type: eventType, date: eventDate, time: eventTime});
+        if (req.body.enableWebHook && req.body.enableWebHook === true) {
+            sendHookData(req.app.get('dbPool'), userId, { type: eventType, date: eventDate, time: eventTime });
         }
         res.end();
-        
+
 
     } catch (err) {
         logger.error(err.message);
@@ -115,8 +115,12 @@ export const visitorRegistration = async (req: Request, res: Response) => {
 export const visitorCancellation = async (req: Request, res: Response) => {
     try {
         await visitorModel.markCancellation(req.app.get('dbPool'), req.body.eventid);
-        if(req.body.enableWebHook && req.body.enableWebHook === true) {
-            sendHookData(req.app.get('dbPool'), req.body.userid, {type: req.body.type, date: req.body.date, time: req.body.time});
+        let event = await hostModel.getEventById(req.app.get('dbPool'), req.body.eventid);
+        event[0].event_data = JSON.parse(event[0].event_data);
+        await notify(event, req.body.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
+        await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + req.body.eventid);
+        if (req.body.enableWebHook && req.body.enableWebHook === true) {
+            sendHookData(req.app.get('dbPool'), req.body.userid, { type: req.body.type, date: req.body.date, time: req.body.time });
         }
         res.end();
     }

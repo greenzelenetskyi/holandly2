@@ -198,6 +198,7 @@ export const getEvent = async (req: Request, res: Response) => {
     try {
         let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId);
         if (result.length > 0) {
+            delete result[0].event_data;
             res.json(result[0]);
         } else {
             res.status(400).json();
