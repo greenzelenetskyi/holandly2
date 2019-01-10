@@ -1,7 +1,9 @@
 #!/bin/bash
 
-read -p "Type your mysql username" uname
-read -p "Type path to the holandly database" dbpath
-read -p "Type the destination db or leave blank" db
-mysql -u $uname -p $db < $dbpath
-
+echo "Type your mysql username"
+read uname
+echo "Type path to the holandly database"
+read dbpath
+echo "Type the destination db or leave blank"
+read db
+mysql -u "$uname" -p "$db" < "$dbpath"

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import jwt from 'jsonwebtoken';
 import { getEndpoint } from '../models/host';
 import { Pool } from 'mysql';
@@ -19,12 +19,16 @@ export const generateApiToken = (userId: number) => {
 export const sendHookData = async (db: Pool, userId: number, resource: any) => {
   try {
     let hostData = await getEndpoint(db, userId);
-    hostData = hostData[0].privatedata;
+    hostData = JSON.parse(hostData[0].privatedata);
     if(hostData.hasOwnProperty('webhookUrl')) {
-      let response = await axios.post(hostData.webhookUrl, resource);
+      let response: AxiosResponse;
+      let numTries = 2;
+      do {
+        response = await axios.post(hostData.webhookUrl, resource);
+        numTries--;
+      } while (response.status != 200 && numTries > 0);
     }
-    
   } catch (err) {
-    logger.error("hi" + err.message);
+    logger.error(err.message);
   }
 }

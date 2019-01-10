@@ -8,6 +8,7 @@
   "XwebhookUrl": "http://....{{}}",
   "types": {
     "grownups": {
+      "enableWebHook": true,
       "path": "exam",
       "color": "#00ffff",
       "rangeDays": 15,

@@ -20,7 +20,7 @@ export const getUserEvents = (db: Pool, userName: string) => {
 };
 
 export const getEventInformation = (db: Pool, event: number) => {
-    let sqlString = `SELECT h.username, h.publicdata AS userEvents
+    let sqlString = `SELECT h.username, h.userid, h.publicdata AS userEvents
                      FROM host h
                             LEFT JOIN scheduled_events e ON h.userid = e.userid
                      WHERE e.eventid = ?`;
