@@ -189,15 +189,50 @@ block block_patterns
                     //input#json.fa.small.form-control(readonly='', value='-')
                     textarea#json.fa.form-control(aria-label='JSON')
                     .input-group-append
-                        #loadFile.fa.fa-download.btn.btn-outline-info(data-tooltip="tooltip" title="Сохранить JSON на ПК")
-                        #saveFile.fa.fa-upload.btn.btn-outline-info(data-tooltip="tooltip" title="Открыть JSON из файла")
+                        #saveFile.fa.fa-download.btn.btn-outline-info(data-tooltip="tooltip" title="Сохранить JSON на ПК")
+                        #loadFile.fa.fa-upload.btn.btn-outline-info(data-tooltip="tooltip" title="Открыть JSON из файла")
                         #postConfig.fa.fa-floppy-o.btn.btn-outline-success(data-tooltip="tooltip" title="Сохранить изменения")
                 //textarea#json.form-control(aria-label='JSON')
                 p.em.small.font-italic#path
                 #expander.fabtn.btn-outline-info Развернуть
                 #editor.json-editor
+                input#files(type = 'file', accept=".json" hidden)
 
     script.
+        $('#loadFile').click(function () {
+            $("input[type='file']").trigger('click');
+        })
+        function handleFileSelect(evt) {
+            var file = evt.target.files[0];
+            var path = (window.URL || window.webkitURL).createObjectURL(file);
+            if (file.type.match('application/json')) {
+                var reader = new FileReader();
+                reader.onload = (function (theFile) {
+                    return function (e) {
+                        console.log("success");
+                        var data = e.target.result;
+                        // console.log(data);
+                        json_config = JSON.parse(data);
+                        printJSON();
+                    };
+                })(file);
+                reader.readAsText(file);
+            }
+        }
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+        function download(content, fileName, contentType) {
+            var a = document.createElement("a");
+            var file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
+
+        $("#saveFile").click(function () {
+            download(JSON.stringify(json_config, "", 2), 'holandly.json', 'text/plain');
+        });
+
         function getApiKey() {
             $.ajax({
                 type: 'GET',
