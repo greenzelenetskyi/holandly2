@@ -174,27 +174,26 @@ block block_visitors
 block block_patterns
     .tab-content.shadow-lg.p-3.mb-5.bg-white.rounded
         .card.border-primary.mb-4.shadow-lg
-            .card-header
-                .input-group.mb-3
-                    .input-group-prepend
-                        span.fa.input-group-text API Key
-                    input#ApiKey.fa.small.form-control(readonly='', value='-')
-                    .input-group-append
-                        #clipboardComy.fa.fa-clipboard.btn.btn-outline-info(data-tooltip="tooltip" title="Копировать ключ в бувер обмена")
-                        #genApiKey.fa.fa-refresh.btn.btn-outline-info(data-tooltip="tooltip" title="Генерировать новый ключ")
             .card-body.text-primary
-                .input-group.mb-3
-                    .input-group-prepend
-                        span.fa.input-group-text JSON
-                    //input#json.fa.small.form-control(readonly='', value='-')
-                    textarea#json.fa.form-control(aria-label='JSON')
-                    .input-group-append
-                        #saveFile.fa.fa-download.btn.btn-outline-info(data-tooltip="tooltip" title="Сохранить JSON на ПК")
-                        #loadFile.fa.fa-upload.btn.btn-outline-info(data-tooltip="tooltip" title="Открыть JSON из файла")
-                        #postConfig.fa.fa-floppy-o.btn.btn-outline-success(data-tooltip="tooltip" title="Сохранить изменения")
-                //textarea#json.form-control(aria-label='JSON')
-                p.em.small.font-italic#path
-                #expander.fabtn.btn-outline-info Развернуть
+                ul.nav.nav-fill
+                    li.nav-item
+                        .input-group.input-group-sm.mb-3
+                            #saveFile.nav-link.fa.fa-download.btn-outline-info(data-tooltip="tooltip" title="Сохранить JSON на ПК")
+                            #loadFile.nav-link.fa.fa-upload.btn-outline-info(data-tooltip="tooltip" title="Открыть JSON из файла")
+                            #postConfig.nav-link.fa.fa-floppy-o.btn-outline-warning(data-tooltip="tooltip" title="Сохранить изменения")
+                            a.nav-link.fa.fa-external-link.btn-outline-success(data-tooltip="tooltip" title="Перейти страницу подписки" href='/'+ login)
+                            //#expander.fa.small.btn-outline-secondary Развернуть
+                    li.nav-item
+                        .input-group.input-group-sm.mb-3
+                            .input-group-prepend
+                                span#inputGroup-sizing-sm.input-group-text.fa.fa-key
+                            input#ApiKey.form-control(readonly='', value='-', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-sm')
+                            .input-group-append
+                                #clipboardComy.fa.fa-clipboard.btn.btn-outline-info(data-tooltip="tooltip" title="Копировать ключ в бувер обмена")
+                                #genApiKey.fa.fa-refresh.btn.btn-outline-info(data-tooltip="tooltip" title="Генерировать новый ключ")
+
+                textarea#json.fa.form-control(aria-label='JSON')
+                a.small.font-italic#path []
                 #editor.json-editor
                 input#files(type = 'file', accept=".json" hidden)
 
