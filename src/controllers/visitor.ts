@@ -137,7 +137,7 @@ export const getRejection = async (req: Request, res: Response) => {
     let reject: number = req.params.eventId;
     try {
         let eventInformation = await visitorModel.getEventInformation(req.app.get('dbPool'), reject);
-        res.render('visitors/cancellation', eventInformation[0]);
+        res.render('visitors/cancellation', { eventInfo: eventInformation[0]} );
     }
     catch (err) {
         logger.error(err.message);

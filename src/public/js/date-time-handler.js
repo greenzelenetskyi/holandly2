@@ -9,18 +9,21 @@ $(document).ready(function () {
     var currEvent = window.holandlyPath;
     fillHeader(serverData.toplevel);
     currType = findEventByPath(serverData.types, currEvent);
+    getOverrideData(currType.override.exactday);
     lastDay = moment().add(currType.rangeDays, 'days');
     $('.subheader').find('span').html(m.lang('ru').format('LLLL'));
     fillSubheader(currType);
     buildWrapper(currType);
     currPageState = 1;
+
+    console.log(scheduled_visitors);
 });
 
 function getOverrideData(currEvntOverride){
     var keys = Object.keys(currEvntOverride);
     var values = Object.values(currEvntOverride);
     for (var i = 0; i < keys.length; i++){
-        override.push({})
+        override.push({day: keys[i], time: values[i]})
     }
 }
 
@@ -163,11 +166,68 @@ function buildDay(index, _moment, parent, data) {
 
 function checkDayAvailability(data, _moment) {
     var dayOfTheWeek = _moment.day();
+    var _overridedDay = checkOverride(_moment);
+    if (_overridedDay !== undefined){
+        var result = false;
+        if (_overridedDay === null)
+            return result;
+        result = !isDayScheduled(_overridedDay, _moment);
+        return result;
+    }
     if (_moment.isAfter(lastDay))
         return false;
     dayOfTheWeek = dayOfTheWeek > 0 ? (dayOfTheWeek - 1) : 6;
     var daysSetup = data.recurring.weekly.days;
-    return (daysSetup[dayOfTheWeek] !== undefined && daysSetup[dayOfTheWeek] !== null);
+    if (daysSetup[dayOfTheWeek] !== undefined && daysSetup[dayOfTheWeek] !== null) {
+        if (daysSetup[dayOfTheWeek].reuse !== undefined){
+            return isDayScheduled(daysSetup[daysSetup[dayOfTheWeek].reuse])
+        }
+        return isDayScheduled(daysSetup[dayOfTheWeek]);
+    }
+    return false;
+}
+
+function checkOverride(_moment) {
+    for (var i = 0; i < override.length; i++){
+        var item = override[i];
+        if (_moment.dayOfYear() === moment(item.day, 'YYYY.MM.DD').dayOfYear()){
+            var value = Object.keys(item.time);
+            if(value[0] === 'slots'){
+                if(item.time.slots.length === 0){
+                    return null;
+                }
+                else {
+                    return {day: moment(_moment), slots: item.time.slots};
+                }
+            }
+            else if (value[0] === 'reuse'){
+                return checkOverride(moment(item.time.reuse, 'YYYY.MM.DD'));
+            }
+        }
+    }
+}
+
+function isDayScheduled(daySetup, _moment){
+    var currDay = moment(_moment);
+    console.log(daySetup);
+    var slots = daySetup.slots;
+    var schedVisNum = 0;
+    for (var i = 0; i < slots.length; i++){
+        var item = slots[i].time;
+        currDay.hours(item.slice(0, 2));
+        currDay.minutes(item.slice(-2));
+        currDay.seconds(0);
+        if(moment(currDay.format()).isAfter(moment().format())){
+            scheduled_visitors.forEach(function (value, i, scheduled_visitors) {
+                if (moment(value.format()).isSame(moment(currDay.format()))){
+                    schedVisNum++;
+                }
+            })
+        } else {
+            schedVisNum += currType.concurrentVisitors;
+        }
+    }
+    return schedVisNum >= (slots.length * currType.concurrentVisitors);
 }
 
 function buildWeeksRegion(parent) {
@@ -223,11 +283,12 @@ function buildTimePicker(_moment, data) {
 }
 
 function buildTimeline(parent, _moment) {
+    var _overridedDay = checkOverride(_moment);
     var dayOfTheWeek = _moment.day();
     dayOfTheWeek = dayOfTheWeek > 0 ? (dayOfTheWeek - 1) : 6;
     var table = $('<ul>').addClass('spots');
     var data = currType.recurring.weekly;
-    var spots = data.days[dayOfTheWeek];
+    var spots = _overridedDay !== undefined ? _overridedDay : data.days[dayOfTheWeek];
     if (spots.slots !== undefined){
         timelineTable(_moment, spots.slots, table);
     }
@@ -438,7 +499,7 @@ function sendData(inputData){
         type: 'POST',
         url: '/sign',
         data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
-        name: inputData.name, email: inputData.email, userName: window.holandlyUser, event_data: outputJson}),
+        name: inputData.name, email: inputData.email, userName: window.holandlyUser, enableWebHook: currType.enableWebHook, event_data: outputJson}),
         // dataType: 'json',
         contentType: "application/json",
         success: function (data) {

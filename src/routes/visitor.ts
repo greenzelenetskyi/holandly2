@@ -5,6 +5,8 @@ export const visitor = visit.Router();
 
 visitor.get('/', visitorController.getTitlePage);
 
+visitor.get('/rejection/:eventId', visitorController.getRejection);
+
 visitor.get('/:userName', visitorController.getUserPage);
 
 visitor.get('/:userName/', visitorController.getUserPage);
@@ -15,4 +17,3 @@ visitor.post('/sign', visitorController.visitorRegistration);
 
 visitor.post('/cancel', visitorController.visitorCancellation);
 
-visitor.get('/rejection/:eventId', visitorController.getRejection);

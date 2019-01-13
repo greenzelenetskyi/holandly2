@@ -1,13 +1,21 @@
 $(document).ready(function () {
-    currHref = $(location).attr('href');
-    serverData = JSON.parse(window.holandlyData);
-    fillHeader();
+    var currHref = $(location).attr('href');
+    var serverData = window.holandlyData;
+    var info = JSON.parse(serverData.userEvents);
+    console.log(info);
+    fillHeader(info);
 });
 
-function fillHeader() {
+function fillHeader(data) {
     var header = $('<div>').addClass('header');
-    header.append($('<div>').addClass('wrapper')
-        .append('<h4>').html(/* user title */));
+    var wrapper1 = $('<div>').addClass('wrapper');
+    var titleWrapper = $('<div>').addClass('title-wrapper');
+    titleWrapper.append($('<div>')
+        .append($('<img>').addClass('avatar js-avatar mbs clickable').attr('src', '/img/shppLogo.png')));
+    wrapper1.append(titleWrapper);
+    wrapper1.append($('<div>').addClass('mbs phs popover-holder')
+        .append($('<div>').addClass('increased popover-toggle silent disabled').html(data.toplevel.title)));
+    header.append(wrapper1);
     header.append($('<hr>').addClass('mbl'));
     var wrapper = $('<div>').addClass('wrapper');
     var adaptive_row = $('<div>').addClass('adaptive row');
@@ -25,6 +33,7 @@ function fillHeader() {
             .append($('<textarea>').addClass('js-cancel-reason').attr({'name': 'cancel_reason', 'rows': '3', 'maxLength': '1000'})))
         .append($('<button>').addClass('button js-cancel-event').html('Отменить событие')));
     wrapper.append(adaptive_row);
+    $('.main-region').append(header).append(wrapper);
 }
 
 function buildSuccessPage(){
