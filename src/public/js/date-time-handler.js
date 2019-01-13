@@ -367,12 +367,12 @@ function buildApplicationForm(parent){
         .append($('<div>')
             .append($('<div>').addClass('field js-input-container mbm')
                 .append($('<label>').html(currType.form.fields[0].label + " *"))
-                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[0].type, 'id': 'name'})))
-            .append($('<span>').attr('data-error', 'full-name'))
+                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[0].type, 'id': 'name'}))
+                .append($('<span>').attr({'data-error': 'full-name', 'id': "error-name"})))
             .append($('<div>').addClass('field js-input-container mbm')
                 .append($('<label>').html(currType.form.fields[1].label + " *"))
-                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[1].type, 'id': 'email'})))
-            .append($('<span>').attr('data-error', 'email'))));
+                .append($('<input>').addClass('js-input text').attr({'type': currType.form.fields[1].type, 'id': 'email'}))
+                .append($('<span>').attr({'data-error': 'email', 'id': "error-email"})))));
     form.append($('<div>').addClass("ptm")
         .append($('<input>').addClass('button js-apply-schedule').attr({'type': 'submit', 'value': 'Спланировать'})));
     parent.append(form);
@@ -407,10 +407,6 @@ function buildSuccessPage(){
         .append($('<hr>').addClass('dotted mbl')));
     div.append(narrowerWrapper);
     mainReg.append(div);
-}
-
-function buildReschedulingPage(){
-
 }
 
 // listeners
@@ -470,6 +466,7 @@ $(document).on('click', '.js-confirm', function () {
 function formListener(form) {
     form.on("submit", function (event) {
         event.preventDefault();
+        clearErrors();
         var name = $('#name').val();
         var email = $('#email').val();
         var namePattern = new RegExp(currType.form.fields[0].regex, 'g');
@@ -478,21 +475,32 @@ function formListener(form) {
         var mailError = !(mailPattern.test(email));
         if (!nameError && !mailError)
             sendData({name: name, email: email});
+        if (nameError) {
+            $('#error-name').addClass('error-message').html('Неверный формат имени и фамилии.');
+            $('#error-name').parent().addClass('contains-error');
+        }
+        if (mailError) {
+            $('#error-email').addClass('error-message').html('Неверный формат почты.');
+            $('#error-email').parent().addClass('contains-error');
+        }
     });
 }
 
 function clearErrors(){
-    $('span').removeClass('error-message');
+    $('#error-name').removeClass('error-message').empty();
+    $('#error-name').parent().removeClass('contains-error');
+    $('#error-email').removeClass('error-message').empty();
+    $('#error-email').parent().removeClass('contains-error');
 }
 
 function sendData(inputData){
     var outputJson = {title: currType.title, location: currType.location, description: currType.description,
-    canCancel: currType.canCancel, cancellationPolicy: currType.cancellationPolicy};
+        canCancel: currType.canCancel, cancellationPolicy: currType.cancellationPolicy};
     $.ajax({
         type: 'POST',
         url: '/sign',
         data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
-        name: inputData.name, email: inputData.email, userName: window.holandlyUser, enableWebHook: currType.enableWebHook, event_data: outputJson}),
+            name: inputData.name, email: inputData.email, userName: window.holandlyUser, enableWebHook: currType.enableWebHook, event_data: outputJson}),
         // dataType: 'json',
         contentType: "application/json",
         success: function (data) {
