@@ -180,9 +180,9 @@ function checkDayAvailability(data, _moment) {
     var daysSetup = data.recurring.weekly.days;
     if (daysSetup[dayOfTheWeek] !== undefined && daysSetup[dayOfTheWeek] !== null) {
         if (daysSetup[dayOfTheWeek].reuse !== undefined){
-            return isDayScheduled(daysSetup[daysSetup[dayOfTheWeek].reuse])
+            return !isDayScheduled(daysSetup[daysSetup[dayOfTheWeek].reuse], _moment)
         }
-        return isDayScheduled(daysSetup[dayOfTheWeek]);
+        return !isDayScheduled(daysSetup[dayOfTheWeek], _moment);
     }
     return false;
 }

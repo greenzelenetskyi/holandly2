@@ -1,12 +1,12 @@
 $(document).ready(function () {
     var currHref = $(location).attr('href');
-    var serverData = window.holandlyData;
-    var info = JSON.parse(serverData.userEvents);
-    console.log(info);
-    fillHeader(info);
+    serverData = window.holandlyData;
+    console.log(serverData);
+    fillHeader(serverData);
 });
 
 function fillHeader(data) {
+    var evData = JSON.parse(data.event_data);
     var header = $('<div>').addClass('header');
     var wrapper1 = $('<div>').addClass('wrapper');
     var titleWrapper = $('<div>').addClass('title-wrapper');
@@ -14,18 +14,19 @@ function fillHeader(data) {
         .append($('<img>').addClass('avatar js-avatar mbs clickable').attr('src', '/img/shppLogo.png')));
     wrapper1.append(titleWrapper);
     wrapper1.append($('<div>').addClass('mbs phs popover-holder')
-        .append($('<div>').addClass('increased popover-toggle silent disabled').html(data.toplevel.title)));
+        .append($('<div>').addClass('increased popover-toggle silent disabled').html(data.title)));
     header.append(wrapper1);
     header.append($('<hr>').addClass('mbl'));
     var wrapper = $('<div>').addClass('wrapper');
     var adaptive_row = $('<div>').addClass('adaptive row');
     adaptive_row.append($('<div>').addClass('col1of2 mbm prm')
         .append($('<div>').addClass('mbs row')
-            .append($('<div>').addClass('marker').css('background-color', ''/*todo: insert color*/))
+            .append($('<div>').addClass('marker').css('background-color', '#dadada'))
             .append($('<div>').addClass('last-col')
-                .append($('<h2>').html('insert meeting name here')))));
-    adaptive_row.append($('<div>').addClass('emphasis iconed-text').html('insert event time here')
-        .append($('<i>').addClass('icon-clock')));
+                .append($('<h2>').html(evData.title))))
+        .append($('<div>').addClass('emphasis iconed-text').html(moment((serverData.date + ' ' + serverData.time), 'DD-MM-YYYY HH:mm')
+            .format('HH:mm - dddd, MMMM Do, YYYY'))
+            .append($('<i>').addClass('icon-clock'))));
     adaptive_row.append($('<div>').addClass('col1of2 plm')
         .append($('<h2>').addClass('mbs').html('Отменить событие?'))
         .append($('<div>').addClass('field mbm')
@@ -37,20 +38,22 @@ function fillHeader(data) {
 }
 
 function buildSuccessPage(){
+    var evData = JSON.parse(serverData.event_data);
     var mainReg = $('.main-region');
     mainReg.empty();
     var div = $('<div>');
     var header = $('<div>').addClass('header');
     header.append($('<h2>').addClass('pts').html('Отмена события успешна'));
-    header.append($('<div>').addClass('mbs phl').html('Ваша встреча с ' + serverData.toplevel.title + ' отменена'));
+    header.append($('<div>').addClass('mbs phl').html('Ваша встреча с ' + serverData.title + ' отменена'));
     div.append(header);
     var narrowerWrapper = $('<div>').addClass('narrower wrapper');
     narrowerWrapper.append($('<hr>').addClass('dotted mbm'));
     var linethrough = $('<div>').addClass('linethrough mbm phm');
     linethrough.append($('<div>').addClass('mbs row')
-        .append($('<div>').addClass('marker').css('background-color', currType.color))
-        .append($('<div>').addClass('last-col').html(currType.title)));
-    linethrough.append($('<div>').addClass('emphasis iconed-text').html(currDaySchedule[picked].format('HH:mm - dddd, MMMM Do, YYYY'))
+        .append($('<div>').addClass('marker').css('background-color', '#dadada'))
+        .append($('<div>').addClass('last-col').html(evData.title)));
+    linethrough.append($('<div>').addClass('emphasis iconed-text').html((moment((serverData.date + ' ' + serverData.time), 'DD-MM-YYYY HH:mm')
+        .format('HH:mm - dddd, MMMM Do, YYYY')))
         .append($('<i>').addClass('icon-clock')));
     linethrough.append($('<hr>').addClass('mbm'));
     narrowerWrapper.append(linethrough);
@@ -61,8 +64,8 @@ function buildSuccessPage(){
 $(document).on('click', '.js-cancel-event', function () {
     $.ajax({
         type: 'POST',
-        url: '',
-        data: JSON.stringify({}),
+        url: '/cancel',
+        data: JSON.stringify({type: serverData.type, eventid: serverData.eventid, userid: serverData.userid, date: serverData.date, time: serverData.time}),
         dataType: 'json',
         contentType: "application/json",
         success: function (data) {
@@ -70,3 +73,5 @@ $(document).on('click', '.js-cancel-event', function () {
         }
     })
 });
+
+var serverData;
