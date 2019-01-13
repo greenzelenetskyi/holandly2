@@ -14,3 +14,8 @@ html
     script(src='/js/cancellation.js')
     script(src='/js/lib/moment-with-locales.js')
     script.
+        var eventInfo = !{JSON.stringify(eventInfo)},
+            all = $.when(eventInfo)
+        all.done(function () {
+            window.holandlyData = eventInfo;
+        })

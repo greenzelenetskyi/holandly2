@@ -107,7 +107,14 @@ block block_visitors
                 {title: "Событие", field: "event", headerFilter: "input"},
                 {title: "Дата события", field: "dateEvent", sorter: "date", align: "center", headerFilter: "input"},
                 {title: "Время события", field: "timeEvent", sorter: "time", align: "center", headerFilter: "input"},
-                {title: "Дата подписки", width: 320, field: "insertion_time", sorter: "date", align: "center", headerFilter: "input"},
+                {
+                    title: "Дата подписки",
+                    width: 320,
+                    field: "insertion_time",
+                    sorter: "date",
+                    align: "center",
+                    headerFilter: "input"
+                },
                 // {title: "Время подписки", field: "timeSign", sorter: "time", align: "center", headerFilter: "input"},
             ],
             rowSelectionChanged: function (data, rows) {
@@ -167,28 +174,64 @@ block block_visitors
 block block_patterns
     .tab-content.shadow-lg.p-3.mb-5.bg-white.rounded
         .card.border-primary.mb-4.shadow-lg
-            .card-header
-                //strong Конфигурация
-                .rouded.float-left
-                    .input-group
-                        .input-group-prepend
-                            span.input-group-text API Key
-                        input#ApiKey.small.form-control(readonly='', value='-')
-                        .input-group-append
-                            #clipboardComy.fa.fa-clipboard.btn.btn-outline-info(data-tooltip="tooltip" title="Копировать ключ в бувер обмена")
-                            #genApiKey.fa.fa-refresh.btn.btn-outline-info(data-tooltip="tooltip" title="Генерировать новый ключ")
-                .rouded.float-right
-                    #expander.a.btn.btn-outline-info Развернуть
-                    #postConfig.a.btn.btn-outline-success Сохранить
             .card-body.text-primary
-                .input-group
-                    .input-group-prepend
-                        span.input-group-text JSON
-                    textarea#json.form-control(aria-label='JSON')
-                p.em.small.font-italic#path
+                ul.nav.nav-fill
+                    li.nav-item
+                        .input-group.input-group-sm.mb-3
+                            #saveFile.nav-link.fa.fa-download.btn-outline-info(data-tooltip="tooltip" title="Сохранить JSON на ПК")
+                            #loadFile.nav-link.fa.fa-upload.btn-outline-info(data-tooltip="tooltip" title="Открыть JSON из файла")
+                            #postConfig.nav-link.fa.fa-floppy-o.btn-outline-warning(data-tooltip="tooltip" title="Сохранить изменения")
+                            a.nav-link.fa.fa-external-link.btn-outline-success(data-tooltip="tooltip" title="Перейти страницу подписки" href='/'+ login)
+                            //#expander.fa.small.btn-outline-secondary Развернуть
+                    li.nav-item
+                        .input-group.input-group-sm.mb-3
+                            .input-group-prepend
+                                span#inputGroup-sizing-sm.input-group-text.fa.fa-key
+                            input#ApiKey.form-control(readonly='', value='-', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-sm')
+                            .input-group-append
+                                #clipboardComy.fa.fa-clipboard.btn.btn-outline-info(data-tooltip="tooltip" title="Копировать ключ в бувер обмена")
+                                #genApiKey.fa.fa-refresh.btn.btn-outline-info(data-tooltip="tooltip" title="Генерировать новый ключ")
+
+                textarea#json.fa.form-control(aria-label='JSON')
+                a.small.font-italic#path []
                 #editor.json-editor
+                input#files(type = 'file', accept=".json" hidden)
 
     script.
+        $('#loadFile').click(function () {
+            $("input[type='file']").trigger('click');
+        })
+        function handleFileSelect(evt) {
+            var file = evt.target.files[0];
+            var path = (window.URL || window.webkitURL).createObjectURL(file);
+            if (file.type.match('application/json')) {
+                var reader = new FileReader();
+                reader.onload = (function (theFile) {
+                    return function (e) {
+                        console.log("success");
+                        var data = e.target.result;
+                        // console.log(data);
+                        json_config = JSON.parse(data);
+                        printJSON();
+                    };
+                })(file);
+                reader.readAsText(file);
+            }
+        }
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+        function download(content, fileName, contentType) {
+            var a = document.createElement("a");
+            var file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
+
+        $("#saveFile").click(function () {
+            download(JSON.stringify(json_config, "", 2), 'holandly.json', 'text/plain');
+        });
+
         function getApiKey() {
             $.ajax({
                 type: 'GET',
