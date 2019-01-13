@@ -6,6 +6,7 @@ import pug from 'pug';
 import path from 'path';
 import { deleteCalendarEvent, insertToCalendar } from '../models/calendar';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
@@ -112,7 +113,7 @@ export const getAppointments = async (req: Request, res: Response) => {
 export const cancelAppointment = async (req: Request, res: Response) => {
     try {
         for (let eventId of req.body.events) {
-            let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId);
+            let result = await hostModel.cancelAppointment(req.app.get('dbPool'), eventId, req.user.userId);
             if (result.affectedRows > 0) {
                 let eventData = await hostModel.getEventById(req.app.get('dbPool'), eventId);
                 eventData.forEach((e: any) => {
@@ -196,7 +197,7 @@ export const getApiToken = async (req: Request, res: Response) => {
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
-        let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId);
+        let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId, req.user);
         if (result.length > 0) {
             delete result[0].event_data;
             res.json(result[0]);
@@ -212,7 +213,7 @@ export const getEvent = async (req: Request, res: Response) => {
 export const cancelEvent = async (req: Request, res: Response) => {
     try {
         let id = req.params.eventId;
-        let result = await hostModel.cancelAppointment(req.app.get('dbPool'), id);
+        let result = await hostModel.cancelAppointment(req.app.get('dbPool'), id, req.user);
         if (result.affectedRows > 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
@@ -227,3 +228,31 @@ export const cancelEvent = async (req: Request, res: Response) => {
         res.status(500).end();
     }
 }
+
+
+export const encryptData = (rawData: string) => {
+    const algorithm = 'aes-192-cbc';
+    let password = 'hola4';                         ////                should be changed to the real password
+    const key = crypto.scryptSync(password, process.env.SALT, 24);
+
+    const iv = Buffer.alloc(16, 0);  // Initialization vector
+
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(rawData, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return encrypted;
+}
+
+export const decryptData = (encrypted: any) => {
+    const algorithm = 'aes-192-cbc';
+    const password = 'hola4';
+    const key = crypto.scryptSync(password, process.env.SALT, 24);
+
+    const iv = Buffer.alloc(16, 0); // Initialization vector.
+
+    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+} 

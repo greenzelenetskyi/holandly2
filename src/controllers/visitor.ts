@@ -8,6 +8,7 @@ import pug from "pug";
 import path from "path";
 import { sendHookData } from "../models/api";
 import moment = require("moment");
+import { encryptData, decryptData } from "./host";
 
 const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
 
@@ -120,7 +121,8 @@ export const visitorCancellation = async (req: Request, res: Response) => {
         await notify(event, req.body.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
         await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + req.body.eventid);
         if (req.body.enableWebHook && req.body.enableWebHook === true) {
-            sendHookData(req.app.get('dbPool'), req.body.userid, { type: req.body.type, date: req.body.date, time: req.body.time });
+            let {packet, event_data} = event[0];
+            sendHookData(req.app.get('dbPool'), req.body.userid, packet);
         }
         res.end();
     }
@@ -134,7 +136,8 @@ export const visitorCancellation = async (req: Request, res: Response) => {
  * Confirmation of the visitor failure from the event.
  */
 export const getRejection = async (req: Request, res: Response) => {
-    let reject: number = req.params.eventId;
+    // let reject: any = decryptData(req.params.eventId);
+    let reject = req.params.eventId;
     try {
         let eventInformation = await visitorModel.getEventInformation(req.app.get('dbPool'), reject);
         res.render('visitors/cancellation', eventInformation[0]);

@@ -17,9 +17,9 @@ export const getActiveEvents = (db: Pool, userId: number) => {
   return makeSqlQuery(db, sqlString, userId);
 }
 
-export const cancelAppointment = (db: Pool, eventid: number) => {
-  let sqlString = `UPDATE scheduled_events SET cancelledbyhost=1 WHERE eventid=?`;
-  return makeSqlQuery(db, sqlString, eventid);
+export const cancelAppointment = (db: Pool, eventid: number, userid: number) => {
+  let sqlString = `UPDATE scheduled_events SET cancelledbyhost=1 WHERE eventid=? && userid=?`;
+  return makeSqlQuery(db, sqlString, [eventid, userid]);
 }
 
 export const updateHostData = (db: Pool, update: any, userId: number) => {
@@ -49,16 +49,22 @@ export const findDuplicate = (db: Pool, data: any) => {
 }
 
 export const markShowedUp = (db: Pool, eventid: number) => {
-  let sqlString = `UPDATE scheduled_events SET showed_up=1 where eventid=?`;
+  let sqlString = `UPDATE scheduled_events SET showed_up=1 where eventid=? && userid=?`;
   return makeSqlQuery(db, sqlString, eventid);
 }
 
-export const getEventById = (db: Pool, eventid: number) => {
-    let sqlString = `SELECT eventid, name, email, date, time, event_data, insertion_time FROM scheduled_events WHERE eventid=?`;
-    return makeSqlQuery(db, sqlString, eventid);
+export const getEventById = (db: Pool, eventid: number, userid?: number) => {
+  let params = [eventid];
+    let sqlString = `SELECT eventid, name, email, date, time, event_data,
+                       insertion_time FROM scheduled_events WHERE eventid=?`;
+    if(userid) {
+      sqlString += ' && userid=?';
+      params.push(userid);
+    }
+    return makeSqlQuery(db, sqlString, params);
 }
 
-export const retrieveApiToken = (db: Pool, userId: number) => {
+export const retrieveApiToken = (db: Pool, userId: number, ) => {
   let sqlString = `SELECT api_token FROM host WHERE userid=?`;
   return makeSqlQuery(db, sqlString, userId);
 }
