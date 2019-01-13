@@ -1,7 +1,6 @@
 $(document).ready(function () {
     var currHref = $(location).attr('href');
     serverData = window.holandlyData;
-    console.log(serverData);
     fillHeader(serverData);
 });
 
@@ -66,7 +65,6 @@ $(document).on('click', '.js-cancel-event', function () {
         type: 'POST',
         url: '/cancel',
         data: JSON.stringify({type: serverData.type, eventid: serverData.eventid, userid: serverData.userid, date: serverData.date, time: serverData.time}),
-        dataType: 'json',
         contentType: "application/json",
         success: function (data) {
             buildSuccessPage();

@@ -15,8 +15,6 @@ $(document).ready(function () {
     fillSubheader(currType);
     buildWrapper(currType);
     currPageState = 1;
-
-    console.log(scheduled_visitors);
 });
 
 function getOverrideData(currEvntOverride){
@@ -209,7 +207,6 @@ function checkOverride(_moment) {
 
 function isDayScheduled(daySetup, _moment){
     var currDay = moment(_moment);
-    console.log(daySetup);
     var slots = daySetup.slots;
     var schedVisNum = 0;
     for (var i = 0; i < slots.length; i++){
@@ -431,8 +428,6 @@ $(document).on('click', '.js-day-wrapper', function () {
     if ($(this).hasClass('unavailable'))
         return;
     var index = $(this).index();
-    console.log(index);
-    console.log(weekArray[index]);
     currDaySchedule = [];
     buildTimePicker(weekArray[index], currType);
 });
@@ -464,8 +459,6 @@ $(document).on('click', '.spots li', function () {
 });
 
 $(document).on('click', '.js-confirm', function () {
-    console.log('--------------------------');
-    console.log(currDaySchedule[picked]);
     var main_region = $('.main-region#main-region');
     main_region.empty();
     var solo = $('<div>').addClass('solo');
@@ -503,7 +496,6 @@ function sendData(inputData){
         // dataType: 'json',
         contentType: "application/json",
         success: function (data) {
-            console.log(data);
             buildSuccessPage();
         }
     })
