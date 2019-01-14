@@ -64,7 +64,8 @@ $(document).on('click', '.js-cancel-event', function () {
     $.ajax({
         type: 'POST',
         url: '/cancel',
-        data: JSON.stringify({type: serverData.type, eventid: serverData.eventid, userid: serverData.userid, date: serverData.date, time: serverData.time}),
+        data: JSON.stringify({type: serverData.type, eventid: serverData.eventid, userid: serverData.userid, date: serverData.date,
+            time: serverData.time, userTitle: serverData.title}),
         contentType: "application/json",
         success: function (data) {
             buildSuccessPage();
