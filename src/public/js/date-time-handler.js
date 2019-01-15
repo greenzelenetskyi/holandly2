@@ -496,13 +496,15 @@ function clearErrors(){
 function sendData(inputData){
     var outputJson = {title: currType.title, location: currType.location, description: currType.description,
         canCancel: currType.canCancel, cancellationPolicy: currType.cancellationPolicy};
+    var d = new Date();
+    var tz = d.getTimezoneOffset();
+    tz /= (-60);
     $.ajax({
         type: 'POST',
         url: '/sign',
         data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
             name: inputData.name, email: inputData.email, userName: window.holandlyUser, enableWebHook: currType.enableWebHook, event_data: outputJson,
-            userTitle: serverData.toplevel.title}),
-        // dataType: 'json',
+            userTitle: serverData.toplevel.title, timezone: tz}),
         contentType: "application/json",
         success: function (data) {
             buildSuccessPage();
