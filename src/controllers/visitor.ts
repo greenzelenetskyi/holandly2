@@ -115,8 +115,10 @@ export const visitorCancellation = async (req: Request, res: Response) => {
         event[0].event_data = JSON.parse(event[0].event_data);
         await notify(event, req.body.userTitle, req.body.reason, 'Отмена: ', useCancelTemplate);
         await deleteCalendarEvent(event[0].insertion_time.valueOf().toString() + req.body.eventid);
-        if (req.body.enableWebHook && req.body.enableWebHook === true) {
-            let {packet, event_data} = event[0];
+        if (req.body.enableWebHook) {
+            let {packet, event_data, data, time} = event[0];
+            packet.timestamp = moment(data + ' ' + time).valueOf();
+            console.log(packet);
             sendHookData(req.app.get('dbPool'), req.body.userid, packet);
         }
         res.end();
