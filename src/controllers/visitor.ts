@@ -6,8 +6,7 @@ import { notify } from "../models/mailer";
 import { insertToCalendar, deleteCalendarEvent } from "../models/calendar";
 import { sendHookData } from "../models/api";
 import moment = require("moment");
-import { decryptData, useConfirmTemplate, useCancelTemplate } from "./host";
-
+import { decryptData, useConfirmTemplate, useCancelTemplate, encryptData } from "./host";
 
 /**
  * Give to a visitor a page without specifying user.
@@ -59,16 +58,16 @@ export const getVisitors = async (req: Request, res: Response) => {
  * Record visitor to the event.
  */
 export const visitorRegistration = async (req: Request, res: Response) => {
-    let eventType = req.body.type;
-    let eventDate = req.body.date;
-    let eventTime = req.body.time;
-    let eventName = req.body.name;
-    let eventEmail = req.body.email;
+    let type = req.body.type;
+    let date = req.body.date;
+    let time = req.body.time;
+    let name = req.body.name;
+    let email = req.body.email;
     let eventUser = req.body.userName;
     let eventData = req.body.event_data;
     try {
         // Checking the existence of the visitor actual record for the current event at a different time or date.
-        let existRecord = await visitorModel.existingRecord(req.app.get('dbPool'), eventType, eventDate, eventTime, eventEmail, eventUser);
+        let existRecord = await visitorModel.existingRecord(req.app.get('dbPool'), type, date, time, email, eventUser);
 
         if (existRecord[0].amount > 0) {
             res.status(400).json({ error: 'This visitor has already existed at this event' });
@@ -81,11 +80,17 @@ export const visitorRegistration = async (req: Request, res: Response) => {
 
         let currentDay = moment().format('YYYYMMDD');
 
-        await visitorModel.markCancellationAll(req.app.get('dbPool'), eventType, currentDay, eventEmail, userId);
+        await visitorModel.markCancellationAll(req.app.get('dbPool'), type, currentDay, email, userId);
 
         // Record visitor to the event.
         let eventInformation = JSON.stringify({ 'description': eventData.description, 'location': eventData.location, 'title': eventData.title });
-        let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), eventType, eventDate, eventTime, eventEmail, eventName, userId, eventInformation);
+        
+        let recVisitor = await visitorModel.visitorRecord(req.app.get('dbPool'), {type: type, date: date, time: time
+                                                                                  , name: name, email: email
+                                                                                  , event_data: eventInformation
+                                                                                  , enableWebHook: req.body.enableWebHook
+                                                                                  , userid: userId
+                                                                                  , timezone: req.body.timezone} );
 
         let id = recVisitor.insertId;
         if (id != 0) {
@@ -93,10 +98,14 @@ export const visitorRegistration = async (req: Request, res: Response) => {
             event[0].event_data = JSON.parse(event[0].event_data);
             await notify(event, req.body.userTitle, req.body.reason, 'Регистрация: ', useConfirmTemplate);
             await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
+            if (event[0].enableWebHook) {
+                let { enableWebHook, event_data, date, time, ...packet } = event[0];
+                packet.timestamp = moment(date + ' ' + time, "DD-MM-YYYY HH:mm").valueOf();
+                packet.timezone = req.body.timezone;
+                sendHookData(req.app.get('dbPool'), userId, packet, 'registered');
+            }
         }
-        if (req.body.enableWebHook && req.body.enableWebHook === true) {
-            sendHookData(req.app.get('dbPool'), userId, { type: eventType, date: eventDate, time: eventTime });
-        }
+
         res.end();
     } catch (err) {
         logger.error(err.message);
@@ -110,16 +119,16 @@ export const visitorRegistration = async (req: Request, res: Response) => {
  */
 export const visitorCancellation = async (req: Request, res: Response) => {
     try {
-        await visitorModel.markCancellation(req.app.get('dbPool'), req.body.eventid);
-        let event = await hostModel.getEventById(req.app.get('dbPool'), req.body.eventid);
+        let id = decryptData(req.body.eventid);
+        await visitorModel.markCancellation(req.app.get('dbPool'), id);
+        let event = await hostModel.getEventById(req.app.get('dbPool'), id);
         event[0].event_data = JSON.parse(event[0].event_data);
         await notify(event, req.body.userTitle, req.body.reason, 'Отмена: ', useCancelTemplate);
-        await deleteCalendarEvent(event[0].insertion_time.valueOf().toString() + req.body.eventid);
-        if (req.body.enableWebHook) {
-            let {packet, event_data, data, time} = event[0];
-            packet.timestamp = moment(data + ' ' + time).valueOf();
-            console.log(packet);
-            sendHookData(req.app.get('dbPool'), req.body.userid, packet);
+        await deleteCalendarEvent(event[0].insertion_time.valueOf().toString() + id);
+        if (event[0].enableWebHook) {
+            let { enableWebHook, event_data, date, time, ...packet } = event[0];
+            packet.timestamp = moment(date + ' ' + time, "DD-MM-YYYY HH:mm").valueOf();
+            sendHookData(req.app.get('dbPool'), req.body.userid, packet, 'cancelled');
         }
         res.end();
     }
@@ -136,7 +145,8 @@ export const getRejection = async (req: Request, res: Response) => {
     try {
         let reject: any = decryptData(req.params.eventId);
         let eventInformation = await visitorModel.getEventInformation(req.app.get('dbPool'), reject);
-        res.render('visitors/cancellation', { eventInfo: eventInformation[0]} );
+        eventInformation[0].eventid = req.params.eventId;
+        res.render('visitors/cancellation', { eventInfo: eventInformation[0] });
     }
     catch (err) {
         logger.error(err.message);

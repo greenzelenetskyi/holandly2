@@ -1,6 +1,6 @@
 import { Pool, MysqlError } from 'mysql';
 
-const makeSqlQueryString = (db: Pool, sqlString: string, params: string | number): Promise<string | eventInf> => {
+const makeSqlQueryString = (db: Pool, sqlString: string, params: string | number): Promise<any> => {
     return new Promise((resolve, reject) => {
         db.query(sqlString, params, (err: MysqlError, result: string) => {
             if (err) {
@@ -87,7 +87,7 @@ export const markCancellationAll = (db: Pool, type: string, date: string, email:
     return makeSqlQueryArString(db, sqlQueryCancelled, [userid, type, email, date]);
 };
 
-export const markCancellation = (db: Pool, eventid: number) => {
+export const markCancellation = (db: Pool, eventid: any) => {
     let sqlQueryCancelled = `UPDATE scheduled_events 
                              SET cancelledbyvisitor = 1
                              WHERE eventid = ?`;
@@ -101,10 +101,9 @@ export const userUniqId = (db: Pool, user: string) => {
     return makeSqlQueryArString(db, sqlQueryData, [user]);
 };
 
-export const visitorRecord = (db: Pool, type: string, date: string, time: string, email: string, name: string, userid: number, eventData: string): Promise<any> => {
-    let sqlQueryRecord = `INSERT INTO scheduled_events (userid, type, date, time, email, name, event_data)
-                          VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    return makeSqlQueryArString(db, sqlQueryRecord, [userid, type, date, time, email, name, eventData]);
+export const visitorRecord = (db: Pool, params: any): Promise<any> => {
+    let sqlQueryRecord = `INSERT INTO scheduled_events SET ?`;
+    return makeSqlQueryArString(db, sqlQueryRecord, params);
 };
 
 //  *******************  Used types  ***********************************************
@@ -117,6 +116,6 @@ type timelineEvents = [eventForTimeline];
 
 type arrayParams = [number, string?, string?, string?, string?, string?, string?];
 
-type eventInf = [ { username: string, userEvents: string} ];
+
 
 //  *******************  End of used types  ****************************************

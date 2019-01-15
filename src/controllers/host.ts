@@ -7,6 +7,7 @@ import path from 'path';
 import { deleteCalendarEvent, insertToCalendar } from '../models/calendar';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import moment from 'moment';
 
 export const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
 export const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
@@ -90,7 +91,7 @@ const filterPrivateData = (config: any, secureData: any, parent?: any) => {
 
 export const getConfigData = async (req: Request, res: Response) => {
     try {
-        let json = await hostModel.getConfigData(req.app.get('dbPool'), 'configuration', req.user.userId);
+        let json = await hostModel.getHostData(req.app.get('dbPool'), 'configuration', req.user.userId);
         if (json.length > 0) {
             res.json(JSON.parse(json[0].configuration));
         }
@@ -200,7 +201,8 @@ export const getEvent = async (req: Request, res: Response) => {
         let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId, req.user);
         if (result.length > 0) {
             delete result[0].event_data;
-            ///let {event, date, time} = result[0];
+            let { enableWebHook, date, time, ...event} = result[0];
+            event.timestamp = moment(date + ' ' + time, "DD-MM-YYYY HH:mm").valueOf();
             res.json(event);
         } else {
             res.status(400).json();
@@ -218,9 +220,9 @@ export const cancelEvent = async (req: Request, res: Response) => {
         if (result.affectedRows > 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
+            res.json();
             await notify(event, req.user.title, req.body.reason, 'Отмена: ', useCancelTemplate);
             deleteCalendarEvent(event[0].insertion_time.valueOf().toString() + id);
-            res.json();
         } else {
             res.status(400).end();
         }
@@ -233,8 +235,8 @@ export const cancelEvent = async (req: Request, res: Response) => {
 
 export const encryptData = (rawData: string) => {
     const algorithm = 'aes-192-cbc';
-    let password = 'hola4';                         ////                should be changed to the real password
-    const key = crypto.scryptSync(password, process.env.SALT, 24);
+
+    const key = crypto.scryptSync(process.env.PASSWORD, process.env.SALT, 24);
 
     const iv = Buffer.alloc(16, 0);  // Initialization vector
 
@@ -246,8 +248,7 @@ export const encryptData = (rawData: string) => {
 
 export const decryptData = (encrypted: any) => {
     const algorithm = 'aes-192-cbc';
-    const password = 'hola4';
-    const key = crypto.scryptSync(password, process.env.SALT, 24);
+    const key = crypto.scryptSync(process.env.PASSWORD, process.env.SALT, 24);
 
     const iv = Buffer.alloc(16, 0); // Initialization vector.
 

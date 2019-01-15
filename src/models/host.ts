@@ -28,7 +28,7 @@ export const updateHostData = (db: Pool, update: any, userId: number) => {
     );
 }
 
-export const getConfigData = (db: Pool, field: string, userid: number) => {
+export const getHostData = (db: Pool, field: string, userid: number) => {
   let sqlString = `SELECT ?? FROM host WHERE userid=?`;
   return makeSqlQuery(db, sqlString, [field, userid]);
 }
@@ -53,9 +53,9 @@ export const markShowedUp = (db: Pool, eventid: number) => {
   return makeSqlQuery(db, sqlString, eventid);
 }
 
-export const getEventById = (db: Pool, eventid: number, userid?: number) => {
+export const getEventById = (db: Pool, eventid: any, userid?: number) => {
   let params = [eventid];
-    let sqlString = `SELECT eventid, type, name, email, date, time, event_data,
+    let sqlString = `SELECT timezone, enableWebHook, eventid, type, name, email, date, time, event_data,
                        insertion_time FROM scheduled_events WHERE eventid=?`;
     if(userid) {
       sqlString += ' && userid=?';

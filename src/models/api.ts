@@ -16,7 +16,7 @@ export const generateApiToken = (userId: number) => {
   });
 }
 
-export const sendHookData = async (db: Pool, userId: number, resource: any) => {
+export const sendHookData = async (db: Pool, userId: number, resource: any, operation: string) => {
   try {
     let hostData = await getEndpoint(db, userId);
     hostData = JSON.parse(hostData[0].privatedata);
@@ -24,7 +24,7 @@ export const sendHookData = async (db: Pool, userId: number, resource: any) => {
       let response: AxiosResponse;
       let numTries = 2;
       do {
-        response = await axios.post(hostData.webhookUrl, resource);
+        response = await axios.post(hostData.webhookUrl + operation, resource);
         numTries--;
       } while (response.status != 200 && numTries > 0);
     }
