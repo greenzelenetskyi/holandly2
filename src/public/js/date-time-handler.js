@@ -500,7 +500,8 @@ function sendData(inputData){
         type: 'POST',
         url: '/sign',
         data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
-            name: inputData.name, email: inputData.email, userName: window.holandlyUser, enableWebHook: currType.enableWebHook, event_data: outputJson}),
+            name: inputData.name, email: inputData.email, userName: window.holandlyUser, enableWebHook: currType.enableWebHook, event_data: outputJson,
+            userTitle: serverData.toplevel.title}),
         // dataType: 'json',
         contentType: "application/json",
         success: function (data) {
