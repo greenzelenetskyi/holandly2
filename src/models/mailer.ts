@@ -37,10 +37,10 @@ export const notify = async (events: TemplateVars[], name: string, explanation: 
     , emailSubject: string, useTemplate: Function) => {
     events.forEach((event: TemplateVars) => {
         let variables: any = { ...event, user: name, reason: explanation };
-        // if(variables.eventid) {
-        //     variables.eventid = encryptData(variables.eventid);  /// id encryption
-        //     variables.cancelLink = process.env.CANCEL_LINK + event.eventid;
-        // }
+        if(variables.eventid) {
+            variables.eventid = encryptData(variables.eventid.toString());  /// id encryption
+            variables.cancelLink = process.env.CANCEL_LINK + variables.eventid;
+        }
         mailer.sendMail({
             from: process.env.DOMAIN_MAIL,
             to: event.email,

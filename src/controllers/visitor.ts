@@ -4,13 +4,10 @@ import { dbPool, logger } from '../config/host';
 import * as hostModel from "../models/host";
 import { notify } from "../models/mailer";
 import { insertToCalendar } from "../models/calendar";
-import pug from "pug";
-import path from "path";
 import { sendHookData } from "../models/api";
 import moment = require("moment");
-import { encryptData, decryptData } from "./host";
+import { encryptData, decryptData, useConfirmTemplate, useCancelTemplate } from "./host";
 
-const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
 
 /**
  * Give to a visitor a page without specifying user.
@@ -94,7 +91,7 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         if (id != 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
-            await notify(event, eventUser, req.body.reason, 'Регистрация: ', useConfirmTemplate);
+            await notify(event, req.body.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
             await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
         if (req.body.enableWebHook && req.body.enableWebHook === true) {
@@ -118,7 +115,7 @@ export const visitorCancellation = async (req: Request, res: Response) => {
         await visitorModel.markCancellation(req.app.get('dbPool'), req.body.eventid);
         let event = await hostModel.getEventById(req.app.get('dbPool'), req.body.eventid);
         event[0].event_data = JSON.parse(event[0].event_data);
-        await notify(event, req.body.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
+        await notify(event, req.body.title, req.body.reason, 'Отмена: ', useCancelTemplate);
         await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + req.body.eventid);
         if (req.body.enableWebHook && req.body.enableWebHook === true) {
             let {packet, event_data} = event[0];
@@ -136,9 +133,8 @@ export const visitorCancellation = async (req: Request, res: Response) => {
  * Confirmation of the visitor failure from the event.
  */
 export const getRejection = async (req: Request, res: Response) => {
-    // let reject: any = decryptData(req.params.eventId);
-    let reject = req.params.eventId;
     try {
+        let reject: any = decryptData(req.params.eventId);
         let eventInformation = await visitorModel.getEventInformation(req.app.get('dbPool'), reject);
         res.render('visitors/cancellation', { eventInfo: eventInformation[0]} );
     }

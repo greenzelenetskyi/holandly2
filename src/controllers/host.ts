@@ -8,8 +8,8 @@ import { deleteCalendarEvent, insertToCalendar } from '../models/calendar';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
-const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
-const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
+export const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
+export const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
 export const requireLogin = (req: Request, res: Response, next: Function) => {
     if (req.path == '/login') {
         next();
@@ -200,7 +200,8 @@ export const getEvent = async (req: Request, res: Response) => {
         let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId, req.user);
         if (result.length > 0) {
             delete result[0].event_data;
-            res.json(result[0]);
+            ///let {event, date, time} = result[0];
+            res.json(event);
         } else {
             res.status(400).json();
         }

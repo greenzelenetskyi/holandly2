@@ -55,7 +55,7 @@ export const markShowedUp = (db: Pool, eventid: number) => {
 
 export const getEventById = (db: Pool, eventid: number, userid?: number) => {
   let params = [eventid];
-    let sqlString = `SELECT eventid, name, email, date, time, event_data,
+    let sqlString = `SELECT eventid, type, name, email, date, time, event_data,
                        insertion_time FROM scheduled_events WHERE eventid=?`;
     if(userid) {
       sqlString += ' && userid=?';
