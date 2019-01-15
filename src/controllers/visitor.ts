@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import * as visitorModel from '../models/visitor';
-import { dbPool, logger } from '../config/host';
+import { logger } from '../config/host';
 import * as hostModel from "../models/host";
 import { notify } from "../models/mailer";
-import { insertToCalendar } from "../models/calendar";
+import { insertToCalendar, deleteCalendarEvent } from "../models/calendar";
 import { sendHookData } from "../models/api";
 import moment = require("moment");
-import { encryptData, decryptData, useConfirmTemplate, useCancelTemplate } from "./host";
+import { decryptData, useConfirmTemplate, useCancelTemplate } from "./host";
 
 
 /**
@@ -91,15 +91,13 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         if (id != 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
-            await notify(event, req.body.title, req.body.reason, 'Регистрация: ', useConfirmTemplate);
+            await notify(event, req.body.userTitle, req.body.reason, 'Регистрация: ', useConfirmTemplate);
             await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
         }
         if (req.body.enableWebHook && req.body.enableWebHook === true) {
             sendHookData(req.app.get('dbPool'), userId, { type: eventType, date: eventDate, time: eventTime });
         }
         res.end();
-
-
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();
@@ -115,8 +113,8 @@ export const visitorCancellation = async (req: Request, res: Response) => {
         await visitorModel.markCancellation(req.app.get('dbPool'), req.body.eventid);
         let event = await hostModel.getEventById(req.app.get('dbPool'), req.body.eventid);
         event[0].event_data = JSON.parse(event[0].event_data);
-        await notify(event, req.body.title, req.body.reason, 'Отмена: ', useCancelTemplate);
-        await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + req.body.eventid);
+        await notify(event, req.body.userTitle, req.body.reason, 'Отмена: ', useCancelTemplate);
+        await deleteCalendarEvent(event[0].insertion_time.valueOf().toString() + req.body.eventid);
         if (req.body.enableWebHook && req.body.enableWebHook === true) {
             let {packet, event_data} = event[0];
             sendHookData(req.app.get('dbPool'), req.body.userid, packet);
