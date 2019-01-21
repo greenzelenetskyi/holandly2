@@ -9,7 +9,7 @@
   "types": {
     "grownups": {
       "enableWebHook": true,
-      "path": "exam",
+      "uniqueId": "exam",
       "color": "#00ffff",
       "rangeDays": 15,
       "canCancel": true,

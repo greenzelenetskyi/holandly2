@@ -57,7 +57,7 @@ function fillSubheader(data) {
 function findEventByPath(data, path){
     var result;
     $.each(data, function (index, value) {
-        if (value.path === path){
+        if (value.uniqueId === path){
             result = value;
         }
     });

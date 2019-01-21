@@ -45,31 +45,48 @@ export const stopSession = (req: Request, res: Response) => {
     });
 }
 
+const findNonUniqueEvents = (types: any) => {
+    let tempArray: any = [];
+    for (let current in types) {
+        if (types.hasOwnProperty(current)) {
+            if (tempArray.indexOf(types[current].uniqueId) !== -1) {
+                return true;
+            } else {
+                tempArray.push(types[current].uniqueId);
+            }
+        }
+    }
+}
 
 export const setConfiguration = async (req: Request, res: Response) => {
     try {
         let privateData = {};
         let publicData = req.body;
-        let configuration = { ...req.body }
-        filterPrivateData(publicData, privateData);
-        let status = await hostModel.updateHostData(req.app.get('dbPool'), {
-            configuration: JSON.stringify(configuration),
-            publicdata: JSON.stringify(publicData),
-            privatedata: JSON.stringify(privateData),
-            title: req.body.toplevel.title
-        }, req.user.userId);
-        if (status.affectedRows > 0) {
-            res.end();
+        let configuration = { ...req.body };
+        let hasNonUniqueEvents = findNonUniqueEvents(publicData.types);
+        if (hasNonUniqueEvents) {
+            res.status(400).json({ message: 'Types should be unique' })
         } else {
-            res.status(400).end();
+            filterPrivateData(publicData, privateData);
+            let status = await hostModel.updateHostData(req.app.get('dbPool'), {
+                configuration: JSON.stringify(configuration),
+                publicdata: JSON.stringify(publicData),
+                privatedata: JSON.stringify(privateData),
+                title: req.body.toplevel.title
+            }, req.user.userId);
+            if (status.affectedRows > 0) {
+                res.end();
+            } else {
+                res.status(400).json({ message: 'Some of the provided data might be incorrect' });
+            }
         }
     } catch (err) {
         logger.error(err.message);
-        res.status(500).end();
+        res.status(500).json({ message: 'Internal error. Try again or contact us!'});
     }
 }
 
-const filterPrivateData = (config: any, secureData: any, parent?: any) => {
+const filterPrivateData = (config: any, secureData: any, parent?: any): any => {
     for (let property in config) {
         if (config.hasOwnProperty(property)) {
             if (property.startsWith(process.env.SECRET_PREFIX)) {
@@ -201,7 +218,7 @@ export const getEvent = async (req: Request, res: Response) => {
         let result = await hostModel.getEventById(req.app.get('dbPool'), req.params.eventId, req.user);
         if (result.length > 0) {
             delete result[0].event_data;
-            let { enableWebHook, date, time, ...event} = result[0];
+            let { enableWebHook, date, time, ...event } = result[0];
             event.timestamp = moment(date + ' ' + time, "DD-MM-YYYY HH:mm").valueOf();
             res.json(event);
         } else {

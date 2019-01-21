@@ -24,6 +24,7 @@ export const sendHookData = async (db: Pool, userId: number, resource: any, oper
       let response: AxiosResponse;
       let numTries = 2;
       do {
+        console.log(hostData.webhookUrl)
         response = await axios.post(hostData.webhookUrl + operation, resource);
         numTries--;
       } while (response.status != 200 && numTries > 0);

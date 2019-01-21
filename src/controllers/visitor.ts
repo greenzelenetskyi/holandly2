@@ -41,7 +41,7 @@ export const getUserPage = async (req: Request, res: Response) => {
  */
 export const getVisitors = async (req: Request, res: Response) => {
     let usr: string = req.params.userName;
-    let path: string = req.params.type;
+    let path: string = req.params.uniqueId;
     try {
         // Getting a list of recorded events.
         let userEvents = await visitorModel.getUserEvents(req.app.get('dbPool'), usr);
@@ -96,6 +96,7 @@ export const visitorRegistration = async (req: Request, res: Response) => {
         if (id != 0) {
             let event = await hostModel.getEventById(req.app.get('dbPool'), id);
             event[0].event_data = JSON.parse(event[0].event_data);
+            res.send();
             await notify(event, req.body.userTitle, req.body.reason, 'Регистрация: ', useConfirmTemplate);
             await insertToCalendar(event[0], event[0].insertion_time.valueOf().toString() + id);
             if (event[0].enableWebHook) {
@@ -105,8 +106,6 @@ export const visitorRegistration = async (req: Request, res: Response) => {
                 sendHookData(req.app.get('dbPool'), userId, packet, 'registered');
             }
         }
-
-        res.end();
     } catch (err) {
         logger.error(err.message);
         res.status(500).end();
@@ -130,7 +129,7 @@ export const visitorCancellation = async (req: Request, res: Response) => {
             packet.timestamp = moment(date + ' ' + time, "DD-MM-YYYY HH:mm").valueOf();
             sendHookData(req.app.get('dbPool'), req.body.userid, packet, 'cancelled');
         }
-        res.end();
+        res.send();
     }
     catch (err) {
         logger.error(err.message);

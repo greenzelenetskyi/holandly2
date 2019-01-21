@@ -8,10 +8,9 @@ visitor.get('/', visitorController.getTitlePage);
 visitor.get('/rejection/:eventId', visitorController.getRejection);
 
 visitor.get('/:userName', visitorController.getUserPage);
+//visitor.get('/:userName/', visitorController.getUserPage);
 
-visitor.get('/:userName/', visitorController.getUserPage);
-
-visitor.get('/:userName/:type', visitorController.getVisitors);
+visitor.get('/:userName/:uniqueId', visitorController.getVisitors);
 
 visitor.post('/sign', visitorController.visitorRegistration);
 
