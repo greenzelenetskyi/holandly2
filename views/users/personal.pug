@@ -181,7 +181,7 @@ block block_patterns
                             #saveFile.nav-link.fa.fa-download.btn-outline-info(data-tooltip="tooltip" title="Сохранить JSON на ПК")
                             #loadFile.nav-link.fa.fa-upload.btn-outline-info(data-tooltip="tooltip" title="Открыть JSON из файла")
                             #postConfig.nav-link.fa.fa-floppy-o.btn-outline-warning(data-tooltip="tooltip" title="Сохранить изменения")
-                            a.nav-link.fa.fa-external-link.btn-outline-success(data-tooltip="tooltip" title="Перейти страницу подписки" href='/'+ login)
+                            a.nav-link.fa.fa-external-link.btn-outline-success(data-tooltip="tooltip" title="Перейти страницу подписки" href='/' + login)
                             //#expander.fa.small.btn-outline-secondary Развернуть
                     li.nav-item
                         .input-group.input-group-sm.mb-3
@@ -336,15 +336,19 @@ block block_patterns
                 console.log('======> postConfig');
                 console.log(config);
                 $.ajax({
-                    type: 'post',
-                    url: '/edit/config',
-                    data: JSON.stringify(config),
-                    contentType: 'application/json',
-                    response: 'json',
-                    success: function (data) {
-                        console.log('======> postConfig ok');
+                        type: 'post',
+                        url: '/edit/config',
+                        data: JSON.stringify(config),
+                        contentType: 'application/json',
+                        response: 'json',
+                        success: function (data) {
+                            console.log('======> postConfig ok');
+                        },
+                        error: function (data) {
+                            alert("Ошибка выполнения" + data);
+                        }
                     }
-                });
+                );
             }
 
             getConfig();
