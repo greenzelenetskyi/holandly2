@@ -345,7 +345,8 @@ block block_patterns
                             console.log('======> postConfig ok');
                         },
                         error: function (data) {
-                            alert("Ошибка выполнения" + data);
+                            alert("Ошибка выполнения" + data.responseJSON.message);
+                            // console.log(data);
                         }
                     }
                 );
