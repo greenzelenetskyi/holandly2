@@ -16,7 +16,7 @@ export const getTitlePage = (req: Request, res: Response) => {
         res.render('visitors/index', { title: 'Main page' })
     }
     catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 };
@@ -31,7 +31,7 @@ export const getUserPage = async (req: Request, res: Response) => {
         res.render('visitors/index', { username: usr, userEvents: userEvents[0] })
     }
     catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 };
@@ -49,7 +49,7 @@ export const getVisitors = async (req: Request, res: Response) => {
         res.render('visitors/event', { username: usr, eventType: path, userEvents: userEvents[0], typeEvents: typeEvents });
     }
     catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 };
@@ -107,7 +107,7 @@ export const visitorRegistration = async (req: Request, res: Response) => {
             }
         }
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 };
@@ -132,7 +132,7 @@ export const visitorCancellation = async (req: Request, res: Response) => {
         res.send();
     }
     catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 };
@@ -148,7 +148,7 @@ export const getRejection = async (req: Request, res: Response) => {
         res.render('visitors/cancellation', { eventInfo: eventInformation[0] });
     }
     catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 };

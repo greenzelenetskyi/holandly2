@@ -67,7 +67,7 @@ export const insertToCalendar = async (data: Event, id: string) => {
         });
         logger.info('Event created: %s', apiResponse.data.htmlLink);
     } catch (err) {
-        logger.error('The API returned an error: ' + err.message);
+        logger.error('The API returned an error: ' + err.stack);
     }
 }
 
@@ -80,6 +80,6 @@ export const deleteCalendarEvent = async (eventId: string) => {
         });
         logger.info('Event deleted');
     } catch (err) {
-        logger.error('The API returned an error: ' + err.message);
+        logger.error('The API returned an error: ' + err.stack);
     }
 }

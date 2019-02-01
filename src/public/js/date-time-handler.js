@@ -9,6 +9,7 @@ $(document).ready(function () {
     var currEvent = window.holandlyPath;
     fillHeader(serverData.toplevel);
     currType = findEventByPath(serverData.types, currEvent);
+    console.log(currType)
     getOverrideData(currType.override.exactday);
     lastDay = moment().add(currType.rangeDays, 'days');
     $('.subheader').find('span').html(m.lang('ru').format('LLLL'));
@@ -502,7 +503,7 @@ function sendData(inputData){
     $.ajax({
         type: 'POST',
         url: '/sign',
-        data: JSON.stringify({type: currType.path, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
+        data: JSON.stringify({type: currType.uniqueId, date: currDaySchedule[picked].format('DD-MM-YYYY'), time: currDaySchedule[picked].format('HH:mm'),
             name: inputData.name, email: inputData.email, userName: window.holandlyUser, enableWebHook: currType.enableWebHook, event_data: outputJson,
             userTitle: serverData.toplevel.title, timezone: tz}),
         contentType: "application/json",

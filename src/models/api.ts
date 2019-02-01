@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import { getEndpoint } from '../models/host';
 import { Pool } from 'mysql';
 import { logger } from '../config/host';
+import { sendNotification } from './mailer';
+import { useHookTemplate } from '../controllers/host';
 
 
 export const generateApiToken = (userId: number) => {
@@ -20,16 +22,16 @@ export const sendHookData = async (db: Pool, userId: number, resource: any, oper
   try {
     let hostData = await getEndpoint(db, userId);
     hostData = JSON.parse(hostData[0].privatedata);
-    if(hostData.hasOwnProperty('webhookUrl')) {
+    if (hostData.hasOwnProperty('webhookUrl')) {
       let response: AxiosResponse;
-      let numTries = 2;
-      do {
-        console.log(hostData.webhookUrl)
-        response = await axios.post(hostData.webhookUrl + operation, resource);
-        numTries--;
-      } while (response.status != 200 && numTries > 0);
+      response = await axios.post(hostData.webhookUrl + operation, resource);
+      if(response.status != 200) {
+        sendNotification(process.env.DOMAIN_MAIL
+          , "API HOOK SERVICE FAILURE", {reason: "The destination server response status is not 200"}, useHookTemplate);
+      }
     }
   } catch (err) {
-    logger.error(err.message);
+    logger.error(err.stack);
+    sendNotification(process.env.DOMAIN_MAIL, "API HOOK SERVICE FAILURE", {reason: err.stack}, useHookTemplate);
   }
 }

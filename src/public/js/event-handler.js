@@ -27,7 +27,7 @@ function fillEvents(data){
             event.append(marker).append(eventTitle).append(description);
             cell.append(event);
             parent.append(cell);
-            cell.attr("href", currHref + '/' + value.uniqueId);
+            cell.attr("href", currHref + (currHref.endsWith("/") ? "" : "/") + value.uniqueId); 
         }
     });
 }

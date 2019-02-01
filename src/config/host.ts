@@ -1,6 +1,8 @@
 import winston, { debug } from 'winston';
 import mysql from 'mysql';
 import session from 'express-session';
+import nodemailer from 'nodemailer';
+import mailgun from 'nodemailer-mailgun-transport';
 
 const MySqlStore = require('express-mysql-session')(session);
 
@@ -27,3 +29,12 @@ export const sessionConfig = {
     saveUninitialized: true,
     store: new MySqlStore({}, dbPool)
 };
+
+const mailgunOptions = {
+    auth: {
+        api_key: process.env.MAILGUN_API_KEY,
+        domain: process.env.MAILGUN_DOMAIN,
+    }
+};
+
+export const mailer = nodemailer.createTransport(mailgun(mailgunOptions));

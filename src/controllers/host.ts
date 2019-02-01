@@ -11,6 +11,8 @@ import moment from 'moment';
 
 export const useCancelTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/cancellation.pug'));
 export const useConfirmTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/confirmation.pug'));
+export const useHookTemplate = pug.compileFile(path.join(__dirname, '../../views/emails/hook-failure.pug'));
+
 export const requireLogin = (req: Request, res: Response, next: Function) => {
     if (req.path == '/login') {
         next();
@@ -25,7 +27,7 @@ export const getMainPage = (req: Request, res: Response) => {
     try {
         res.render('users/personal', { login: req.user.username });
     } catch (err) {
-        logger.error(err.message)
+        logger.error(err.stack)
     }
 }
 
@@ -33,7 +35,7 @@ export const getLoginPage = (req: Request, res: Response) => {
     try {
         res.render('users/signIn');
     } catch (err) {
-        logger.error(err.message)
+        logger.error(err.stack)
     }
 }
 
@@ -65,7 +67,7 @@ export const setConfiguration = async (req: Request, res: Response) => {
         let configuration = { ...req.body };
         let hasNonUniqueEvents = findNonUniqueEvents(publicData.types);
         if (hasNonUniqueEvents) {
-            res.status(400).json({ message: 'Types should be unique' })
+            res.status(400).json({ message: 'поле uniqueId должно быть уникальным для каждого события' })
         } else {
             filterPrivateData(publicData, privateData);
             let status = await hostModel.updateHostData(req.app.get('dbPool'), {
@@ -77,12 +79,12 @@ export const setConfiguration = async (req: Request, res: Response) => {
             if (status.affectedRows > 0) {
                 res.end();
             } else {
-                res.status(400).json({ message: 'Some of the provided data might be incorrect' });
+                res.status(400).json({ message: 'проверьте правильно ли вы ввели все данные' });
             }
         }
     } catch (err) {
-        logger.error(err.message);
-        res.status(500).json({ message: 'Internal error. Try again or contact us!'});
+        logger.error(err.stack);
+        res.status(500).json({ message: 'ошибка на сервере. Попробуйте еще раз или свяжитесь с нами'});
     }
 }
 
@@ -114,7 +116,7 @@ export const getConfigData = async (req: Request, res: Response) => {
         }
         res.status(400).end();
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
     }
 }
 
@@ -123,7 +125,7 @@ export const getAppointments = async (req: Request, res: Response) => {
         let appointments = await hostModel.getActiveEvents(req.app.get('dbPool'), req.user.userId);
         res.json(appointments);
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
@@ -143,7 +145,7 @@ export const cancelAppointment = async (req: Request, res: Response) => {
         }
         res.json();
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
@@ -166,7 +168,7 @@ export const addAppointment = async (req: Request, res: Response) => {
             res.json();
         }
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
@@ -178,7 +180,7 @@ export const markAttended = async (req: Request, res: Response) => {
         }
         res.end();
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
@@ -194,7 +196,7 @@ export const createApiToken = async (req: Request, res: Response) => {
             res.status(400).end();
         }
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
@@ -208,7 +210,7 @@ export const getApiToken = async (req: Request, res: Response) => {
             res.status(400).end();
         }
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
@@ -225,7 +227,7 @@ export const getEvent = async (req: Request, res: Response) => {
             res.status(400).json();
         }
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
@@ -244,7 +246,7 @@ export const cancelEvent = async (req: Request, res: Response) => {
             res.status(400).end();
         }
     } catch (err) {
-        logger.error(err.message);
+        logger.error(err.stack);
         res.status(500).end();
     }
 }
