@@ -342,11 +342,9 @@ block block_patterns
                         contentType: 'application/json',
                         response: 'json',
                         success: function (data) {
-                            console.log('======> postConfig ok');
                         },
                         error: function (data) {
                             alert("Ошибка: " + data.responseJSON.message);
-                            console.log(data);
                         }
                     }
                 );
