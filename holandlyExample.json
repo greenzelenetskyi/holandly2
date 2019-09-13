@@ -1,0 +1,319 @@
+{
+  "types": {
+    "grownups": {
+      "form": {
+        "fields": [
+          {
+            "type": "text",
+            "label": "Имя И фамилия",
+            "regex": ".+ .+",
+            "minLen": 54
+          },
+          {
+            "type": "text",
+            "label": "email",
+            "regex": ".*@.*\\..*"
+          }
+        ]
+      },
+      "color": "#00ffff",
+      "title": "[14+ лет] Вступительный тест",
+      "secret": false,
+      "enabled": true,
+      "location": "Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж",
+      "override": {
+        "exactday": {
+          "2018.11.11": {
+            "slots": []
+          },
+          "2018.11.12": {
+            "reuse": "2018.11.11"
+          }
+        }
+      },
+      "uniqueId": "exam",
+      "canCancel": true,
+      "rangeDays": 15,
+      "recurring": {
+        "weekly": {
+          "days": [
+            {
+              "slots": [
+                {
+                  "time": "10:00"
+                },
+                {
+                  "time": "11:00"
+                },
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                },
+                {
+                  "time": "17:00"
+                }
+              ]
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "slots": [
+                {
+                  "time": "11:00"
+                },
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "api_enabled": true,
+      "description": "Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз",
+      "durationMinutes": 120,
+      "cancellationPolicy": "...",
+      "concurrentVisitors": 2
+    },
+    "children7": {
+      "form": {
+        "fields": [
+          {
+            "type": "text",
+            "label": "Имя И фамилия",
+            "regex": ".+ .+",
+            "minLen": 5
+          },
+          {
+            "type": "text",
+            "label": "email",
+            "regex": ".*@.*\\..*"
+          }
+        ]
+      },
+      "color": "#00aaaa",
+      "title": "[7-11 лет] Вступительный тест",
+      "secret": false,
+      "enabled": true,
+      "location": "Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж",
+      "override": {
+        "exactday": {
+          "2018.11.11": {
+            "slots": []
+          },
+          "2018.11.12": {
+            "reuse": "2018.11.11"
+          }
+        }
+      },
+      "uniqueId": "children_exam",
+      "canCancel": true,
+      "rangeDays": 15,
+      "recurring": {
+        "weekly": {
+          "days": [
+            {
+              "slots": [
+                {
+                  "time": "9:00"
+                },
+                {
+                  "time": "10:00"
+                },
+                {
+                  "time": "11:00"
+                },
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "slots": [
+                {
+                  "time": "11:00"
+                },
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "description": "Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз",
+      "durationMinutes": 60,
+      "cancellationPolicy": "...",
+      "concurrentVisitors": 2
+    },
+    "teenagers": {
+      "form": {
+        "fields": [
+          {
+            "type": "text",
+            "label": "Имя И фамилия",
+            "regex": ".+ .+",
+            "minLen": 5
+          },
+          {
+            "type": "text",
+            "label": "email",
+            "regex": ".*@.*\\..*"
+          }
+        ]
+      },
+      "color": "#ff0000",
+      "title": "[11-14 лет] Вступительный тест",
+      "secret": false,
+      "enabled": true,
+      "location": "Ш++, г. Кропивницкий, пер. Васильевский, 5 этаж",
+      "override": {
+        "exactday": {
+          "2018.11.11": {
+            "slots": [
+              {
+                "time": "12:00"
+              }
+            ]
+          },
+          "2018.11.12": {
+            "reuse": "2018.11.11"
+          }
+        }
+      },
+      "uniqueId": "teen_exam",
+      "canCancel": false,
+      "rangeDays": 12,
+      "recurring": {
+        "weekly": {
+          "days": [
+            {
+              "slots": [
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "reuse": 0
+            },
+            {
+              "slots": [
+                {
+                  "time": "12:00"
+                },
+                {
+                  "time": "13:00"
+                },
+                {
+                  "time": "14:00"
+                },
+                {
+                  "time": "15:00"
+                },
+                {
+                  "time": "16:00"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "description": "Обязательно указывайте электронный адрес, с которым вы регистрировались на портале. Будьте внимательны — записаться можно только один раз",
+      "durationMinutes": 90,
+      "cancellationPolicy": "...",
+      "concurrentVisitors": 2
+    }
+  },
+  "timezone": "GMT+3",
+  "toplevel": {
+    "title": "Школа программирования Ш++",
+    "endmessage": "Спасибо за регистрацию!",
+    "description": "Добро пожаловать! Выберите, пожалуйста, удобную для вас дату и время"
+  },
+  "XwebhookUrl": "http://....{{}}"
+}
